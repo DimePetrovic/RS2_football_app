@@ -1,0 +1,177 @@
+# ============================================================
+# .NET / C#
+# ============================================================
+
+# Build output
+[Bb]in/
+[Oo]bj/
+[Pp]ublish/
+artifacts/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+# Commit packages.lock.json — reproducible builds
+!packages.lock.json
+
+# User-specific IDE files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Test results & coverage
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+coverage-report/
+lcov.info
+
+# dotnet tool manifest se commituje (deli se u timu)
+!.config/dotnet-tools.json
+
+# Crash dumps
+*.dmp
+
+# ============================================================
+# Entity Framework Core
+# ============================================================
+
+# Migracije SE commituju — ignorišemo samo SQL skripte generisane iz njih
+*.dbmdl
+*.mdf
+*.ldf
+
+# ============================================================
+# Secrets i lokalna konfiguracija
+# ============================================================
+
+# Lokalna podešavanja — svaki dev ima svoje (connection stringovi, lozinke)
+appsettings.Local.json
+appsettings.*.Local.json
+
+# .NET User Secrets (čuvaju se van projekta, %APPDATA%/UserSecrets)
+# Nema ih u repozitorijumu po definiciji, ali za svaki slučaj:
+secrets.json
+
+# Sertifikati i ključevi
+*.pfx
+*.p12
+*.pem
+*.key
+*.crt
+*.cer
+
+# ============================================================
+# Angular / Node.js
+# ============================================================
+
+node_modules/
+
+# Angular build output
+dist/
+.angular/
+
+# npm / yarn logovi
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# TypeScript incremental compilation
+*.tsbuildinfo
+
+# ============================================================
+# Varijable okruženja
+# ============================================================
+
+.env
+.env.*
+# Primer fajl se commituje — sadrži ključeve bez vrednosti
+!.env.example
+
+# ============================================================
+# Docker — lokalne varijante
+# ============================================================
+
+# docker-compose.yml i docker-compose.override.yml SE commituju
+# Lična podešavanja koja ne idu u repo:
+docker-compose.local.yml
+docker-compose.*.local.yml
+
+# Lokalni Docker volumeni (ako se montiraju u projektu)
+.docker-volumes/
+docker/volumes/
+
+# ============================================================
+# IDE — Visual Studio
+# ============================================================
+
+.vs/
+*.VC.db
+*.VC.opendb
+
+# ============================================================
+# IDE — JetBrains Rider / WebStorm / DataGrip
+# ============================================================
+
+.idea/
+*.iml
+
+# ============================================================
+# IDE — VS Code
+# ============================================================
+
+# Tim settings se commituju, lična podešavanja ne
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# ============================================================
+# OS
+# ============================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.Trash-*
+
+# ============================================================
+# Logovi aplikacije
+# ============================================================
+
+logs/
+*.log
+
+# ============================================================
+# Claude Code
+# ============================================================
+
+.claude/
+
+# ============================================================
+# Ostalo
+# ============================================================
+
+# Vim swap fajlovi
+*.swp
+*.swo
+docs/api/

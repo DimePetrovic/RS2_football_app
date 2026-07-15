@@ -1,0 +1,21 @@
+<div class="auth-card confirm-card">
+  @switch (state()) {
+    @case ('verifying') {
+      <mat-spinner diameter="48" />
+      <p class="confirm-label">{{ 'auth.confirmEmail.verifying' | translate }}</p>
+    }
+    @case ('success') {
+      <span class="material-icons confirm-icon confirm-icon--success">check_circle</span>
+      <h2 class="auth-title">{{ 'auth.confirmEmail.successTitle' | translate }}</h2>
+      <p class="auth-subtitle">{{ 'auth.confirmEmail.successMessage' | translate }}</p>
+    }
+    @case ('error') {
+      <span class="material-icons confirm-icon confirm-icon--error">cancel</span>
+      <h2 class="auth-title">{{ 'auth.confirmEmail.errorTitle' | translate }}</h2>
+      <p class="auth-subtitle">{{ 'auth.confirmEmail.errorMessage' | translate }}</p>
+      <a mat-raised-button routerLink="/auth/register" class="cb-btn-primary">
+        {{ 'auth.confirmEmail.tryAgain' | translate }}
+      </a>
+    }
+  }
+</div>

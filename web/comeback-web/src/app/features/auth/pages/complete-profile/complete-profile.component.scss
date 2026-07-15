@@ -1,0 +1,31 @@
+@use '../auth-page';
+
+.goalkeeper-check {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  color: var(--cb-text);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.center-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 200px;
+}
+
+.expired-icon {
+  font-size: 64px;
+  color: var(--cb-text-muted);
+  text-align: center;
+}
+
+.success-icon {
+  font-size: 64px;
+  color: var(--cb-primary);
+  text-align: center;
+}

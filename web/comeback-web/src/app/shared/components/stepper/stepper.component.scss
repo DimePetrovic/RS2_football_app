@@ -1,0 +1,86 @@
+.cb-stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 24px;
+}
+
+.cb-stepper__step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--cb-text-muted);
+  font-family: var(--cb-font-body);
+  cursor: default;
+  flex-shrink: 0;
+
+  &--done { cursor: pointer; }
+}
+
+.cb-stepper__circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--cb-border);
+  background: var(--cb-surface);
+  color: var(--cb-text-muted);
+  font-family: var(--cb-font-mono);
+  font-weight: 800;
+  font-size: 13px;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+
+  .material-icons { font-size: 16px; }
+}
+
+.cb-stepper__label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  // Skloni labele na uskim ekranima — ostaju samo brojevi/krugovi
+  @media (max-width: 480px) {
+    display: none;
+  }
+}
+
+// Aktivan korak: Volt fill, tamni broj, svetla labela
+.cb-stepper__step--active {
+  color: var(--cb-primary);
+
+  .cb-stepper__circle {
+    background: var(--cb-primary);
+    border-color: var(--cb-primary);
+    color: var(--cb-on-primary);
+  }
+}
+
+// Completed step: Volt checkmark in an outlined circle
+.cb-stepper__step--done {
+  color: var(--cb-text-secondary);
+
+  .cb-stepper__circle {
+    background: color-mix(in srgb, var(--cb-primary) 16%, transparent);
+    border-color: var(--cb-primary);
+    color: var(--cb-primary);
+  }
+}
+
+.cb-stepper__line {
+  flex: 1 1 auto;
+  height: 2px;
+  min-width: 12px;
+  background: var(--cb-border);
+  border-radius: 2px;
+  transition: background 0.15s;
+
+  &--done { background: var(--cb-primary); }
+}

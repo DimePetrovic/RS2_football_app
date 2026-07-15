@@ -1,0 +1,16 @@
+# Lokalne development overrides — ovaj fajl se commituje
+# Za lična podešavanja koristi docker-compose.local.yml (ignorisan u .gitignore)
+
+services:
+
+  postgres-auth:
+    environment:
+      POSTGRES_PASSWORD: comeback_dev
+
+  postgres-profile:
+    environment:
+      POSTGRES_PASSWORD: comeback_dev
+
+  rabbitmq:
+    environment:
+      RABBITMQ_DEFAULT_PASS: comeback_dev

@@ -1,0 +1,193 @@
+@switch (pageState()) {
+
+  @case ('validating') {
+    <div class="auth-card center-card">
+      <mat-spinner diameter="40" />
+    </div>
+  }
+
+  @case ('form') {
+    <div class="auth-card">
+      <h2 class="auth-title">{{ 'auth.completeProfile.title' | translate }}</h2>
+      <p class="auth-subtitle">{{ 'auth.completeProfile.subtitle' | translate }}</p>
+
+      @if (errorMessage()) {
+        <div class="error-banner">
+          <span class="material-icons">error_outline</span>
+          <span>{{ errorMessage() | translate }}</span>
+        </div>
+      }
+
+      <app-stepper
+        [steps]="steps"
+        [current]="currentStep()"
+        (stepSelected)="goToStep($event)"
+      />
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="auth-form">
+        @if (currentStep() === 0) {
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'auth.completeProfile.firstName' | translate }}</mat-label>
+            <input matInput formControlName="firstName" type="text" autocomplete="given-name" />
+            @if (form.get('firstName')?.hasError('required') && form.get('firstName')?.touched) {
+              <mat-error>{{ 'errors.required' | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'auth.completeProfile.lastName' | translate }}</mat-label>
+            <input matInput formControlName="lastName" type="text" autocomplete="family-name" />
+            @if (form.get('lastName')?.hasError('required') && form.get('lastName')?.touched) {
+              <mat-error>{{ 'errors.required' | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'auth.completeProfile.dateOfBirth' | translate }}</mat-label>
+            <input matInput formControlName="dateOfBirth" type="text" placeholder="dd/mm/yyyy" maxlength="10" />
+            @if (form.get('dateOfBirth')?.hasError('required') && form.get('dateOfBirth')?.touched) {
+              <mat-error>{{ 'errors.required' | translate }}</mat-error>
+            } @else if (form.get('dateOfBirth')?.hasError('dateFormat') && form.get('dateOfBirth')?.touched) {
+              <mat-error>{{ 'errors.dateFormat' | translate }}</mat-error>
+            } @else if (form.get('dateOfBirth')?.hasError('dateInvalid') && form.get('dateOfBirth')?.touched) {
+              <mat-error>{{ 'errors.dateInvalid' | translate }}</mat-error>
+            } @else if (form.get('dateOfBirth')?.hasError('dateYear') && form.get('dateOfBirth')?.touched) {
+              <mat-error>{{ 'errors.dateYear' | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cp-field">
+          <mat-label>{{ 'profile.nationality' | translate }}</mat-label>
+          <mat-select formControlName="nationality">
+            <mat-option [value]="null">{{ 'profile.nationalityNone' | translate }}</mat-option>
+            @for (c of countryOptions(); track c.code) {
+              <mat-option [value]="c.code"><span class="country-flag {{ c.flag }}"></span> {{ c.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        }
+
+        @if (currentStep() === 1) {
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'auth.completeProfile.preferredPosition' | translate }}</mat-label>
+            <mat-select formControlName="preferredPosition">
+              @for (pos of positions; track pos.value) {
+                <mat-option [value]="pos.value">{{ pos.labelKey | translate }}</mat-option>
+              }
+            </mat-select>
+            @if (form.get('preferredPosition')?.hasError('required') && form.get('preferredPosition')?.touched) {
+              <mat-error>{{ 'errors.required' | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+          @if (!isGoalkeeper() && selectedPosition() !== null) {
+            <mat-checkbox formControlName="canPlayGoalkeeper" class="goalkeeper-check">
+              {{ 'auth.completeProfile.canPlayGoalkeeper' | translate }}
+            </mat-checkbox>
+          }
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'auth.completeProfile.youthSeasons' | translate }}</mat-label>
+            <input matInput formControlName="youthSeasons" type="number" min="0" max="10" />
+            @if (form.get('youthSeasons')?.hasError('min') || form.get('youthSeasons')?.hasError('max')) {
+              <mat-error>{{ 'errors.range010' | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'auth.completeProfile.seniorSeasons' | translate }}</mat-label>
+            <input matInput formControlName="seniorSeasons" type="number" min="0" max="20" />
+            @if (form.get('seniorSeasons')?.hasError('min') || form.get('seniorSeasons')?.hasError('max')) {
+              <mat-error>{{ 'errors.range020' | translate }}</mat-error>
+            }
+          </mat-form-field>
+        }
+
+        <div class="cb-wizard-nav">
+          @if (currentStep() === 1) {
+            <button type="button" mat-button class="cb-btn-secondary cb-wizard-nav__back" (click)="prev()">
+              <mat-icon>arrow_back</mat-icon> {{ 'common.back' | translate }}
+            </button>
+          }
+
+          @if (currentStep() === 0) {
+            <button type="button" mat-raised-button class="cb-btn-primary"
+              [disabled]="!step1Valid()" (click)="next()">
+              {{ 'common.next' | translate }} <mat-icon>arrow_forward</mat-icon>
+            </button>
+          } @else {
+            <button mat-raised-button type="submit" class="cb-btn-primary"
+              [disabled]="pageState() === 'loading'">
+              @if (pageState() === 'loading') {
+                <mat-spinner diameter="20" />
+              } @else {
+                {{ 'auth.completeProfile.submit' | translate }}
+              }
+            </button>
+          }
+        </div>
+      </form>
+    </div>
+  }
+
+  @case ('loading') {
+    <div class="auth-card center-card">
+      <mat-spinner diameter="40" />
+    </div>
+  }
+
+  @case ('expired') {
+    <div class="auth-card">
+      <span class="material-icons expired-icon">link_off</span>
+      <h2 class="auth-title">{{ 'auth.completeProfile.expiredTitle' | translate }}</h2>
+      <p class="auth-subtitle">{{ 'auth.completeProfile.expiredMessage' | translate }}</p>
+
+      @if (errorMessage()) {
+        <div class="error-banner">
+          <span class="material-icons">error_outline</span>
+          <span>{{ errorMessage() | translate }}</span>
+        </div>
+      }
+
+      <form [formGroup]="resendForm" (ngSubmit)="resend()" novalidate class="auth-form">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'auth.completeProfile.yourEmail' | translate }}</mat-label>
+          <input matInput formControlName="email" type="email" autocomplete="email" />
+          @if (resendForm.get('email')?.hasError('required') && resendForm.get('email')?.touched) {
+            <mat-error>{{ 'errors.required' | translate }}</mat-error>
+          } @else if (resendForm.get('email')?.hasError('email') && resendForm.get('email')?.touched) {
+            <mat-error>{{ 'errors.email' | translate }}</mat-error>
+          }
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          type="submit"
+          class="cb-btn-primary"
+          [disabled]="pageState() === 'resending'"
+        >
+          @if (pageState() === 'resending') {
+            <mat-spinner diameter="20" />
+          } @else {
+            {{ 'auth.completeProfile.resendButton' | translate }}
+          }
+        </button>
+      </form>
+    </div>
+  }
+
+  @case ('resending') {
+    <div class="auth-card center-card">
+      <mat-spinner diameter="40" />
+    </div>
+  }
+
+  @case ('resent') {
+    <div class="auth-card center-card">
+      <span class="material-icons success-icon">mark_email_read</span>
+      <h2 class="auth-title">{{ 'auth.completeProfile.resentTitle' | translate }}</h2>
+      <p class="auth-subtitle">{{ 'auth.completeProfile.resentMessage' | translate }}</p>
+    </div>
+  }
+
+}

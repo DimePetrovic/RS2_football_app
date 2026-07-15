@@ -1,0 +1,39 @@
+<div class="main-layout">
+  <header class="top-bar">
+    <a class="top-bar__logo" [routerLink]="'/feed'"><app-logo variant="full" size="sm" /></a>
+    <div class="top-bar__actions">
+      <a class="top-bar__notif-btn" [routerLink]="'/chats'">
+        <mat-icon>chat</mat-icon>
+        @if (unreadChatCount() > 0) {
+          <span class="top-bar__badge">{{ unreadChatCount() > 99 ? '99+' : unreadChatCount() }}</span>
+        }
+      </a>
+      <a class="top-bar__notif-btn" [routerLink]="'/notifications'">
+        <mat-icon>notifications</mat-icon>
+        @if (unreadCount() > 0) {
+          <span class="top-bar__badge">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
+        }
+      </a>
+      <button mat-icon-button class="top-bar__logout" (click)="confirmLogout()" [matTooltip]="'nav.logout' | translate">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </header>
+
+  <main class="main-layout__content">
+    <router-outlet />
+  </main>
+
+  <nav class="bottom-nav">
+    @for (item of navItems; track item.route) {
+      <a
+        class="bottom-nav__item"
+        [routerLink]="item.route"
+        routerLinkActive="bottom-nav__item--active"
+      >
+        <span class="material-icons bottom-nav__icon">{{ item.icon }}</span>
+        <span class="bottom-nav__label">{{ item.labelKey | translate }}</span>
+      </a>
+    }
+  </nav>
+</div>

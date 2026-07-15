@@ -1,0 +1,116 @@
+@if (pageState() === 'success') {
+  <div class="auth-card success-card">
+    <span class="material-icons success-icon">mark_email_read</span>
+    <h2 class="auth-title">{{ 'auth.register.successTitle' | translate }}</h2>
+    <p class="auth-subtitle">
+      {{ 'auth.register.successMessage' | translate : { email: registeredEmail() } }}
+    </p>
+    <a mat-stroked-button routerLink="/auth/login" class="cb-btn-ghost">
+      {{ 'auth.login.submit' | translate }}
+    </a>
+  </div>
+} @else {
+  <div class="auth-card">
+    <h2 class="auth-title">{{ 'auth.register.title' | translate }}</h2>
+    <p class="auth-subtitle">{{ 'auth.register.subtitle' | translate }}</p>
+
+    @if (errorMessage()) {
+      <div class="error-banner">
+        <span class="material-icons">error_outline</span>
+        <span>{{ errorMessage() | translate }}</span>
+      </div>
+    }
+
+    <app-stepper
+      [steps]="steps"
+      [current]="currentStep()"
+      (stepSelected)="goToStep($event)"
+    />
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="auth-form">
+      @if (currentStep() === 0) {
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'auth.register.email' | translate }}</mat-label>
+          <input matInput formControlName="email" type="email" autocomplete="email" />
+          @if (form.get('email')?.hasError('required') && form.get('email')?.touched) {
+            <mat-error>{{ 'errors.required' | translate }}</mat-error>
+          } @else if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
+            <mat-error>{{ 'errors.email' | translate }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'auth.register.username' | translate }}</mat-label>
+          <input matInput formControlName="username" type="text" autocomplete="username" />
+          @if (form.get('username')?.hasError('required') && form.get('username')?.touched) {
+            <mat-error>{{ 'errors.required' | translate }}</mat-error>
+          } @else if (form.get('username')?.hasError('minlength') && form.get('username')?.touched) {
+            <mat-error>{{ 'errors.minLength' | translate : { min: 3 } }}</mat-error>
+          }
+        </mat-form-field>
+      }
+
+      @if (currentStep() === 1) {
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'auth.register.password' | translate }}</mat-label>
+          <input
+            matInput
+            formControlName="password"
+            [type]="passwordVisible() ? 'text' : 'password'"
+            autocomplete="new-password"
+          />
+          <button mat-icon-button matSuffix type="button" (click)="togglePassword()">
+            <mat-icon>{{ passwordVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (form.get('password')?.hasError('required') && form.get('password')?.touched) {
+            <mat-error>{{ 'errors.required' | translate }}</mat-error>
+          } @else if (form.get('password')?.hasError('minlength') && form.get('password')?.touched) {
+            <mat-error>{{ 'errors.minLength' | translate : { min: 8 } }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'auth.register.confirmPassword' | translate }}</mat-label>
+          <input
+            matInput
+            formControlName="confirmPassword"
+            [type]="passwordVisible() ? 'text' : 'password'"
+            autocomplete="new-password"
+          />
+          @if (form.hasError('passwordMismatch') && form.get('confirmPassword')?.touched) {
+            <mat-error>{{ 'errors.passwordMismatch' | translate }}</mat-error>
+          }
+        </mat-form-field>
+      }
+
+      <div class="cb-wizard-nav">
+        @if (currentStep() === 1) {
+          <button type="button" mat-button class="cb-btn-secondary cb-wizard-nav__back" (click)="prev()">
+            <mat-icon>arrow_back</mat-icon> {{ 'common.back' | translate }}
+          </button>
+        }
+
+        @if (currentStep() === 0) {
+          <button type="button" mat-raised-button class="cb-btn-primary"
+            [disabled]="!step1Valid()" (click)="next()">
+            {{ 'common.next' | translate }} <mat-icon>arrow_forward</mat-icon>
+          </button>
+        } @else {
+          <button mat-raised-button type="submit" class="cb-btn-primary"
+            [disabled]="pageState() === 'loading'">
+            @if (pageState() === 'loading') {
+              <mat-spinner diameter="20" />
+            } @else {
+              {{ 'auth.register.submit' | translate }}
+            }
+          </button>
+        }
+      </div>
+    </form>
+
+    <p class="auth-link">
+      {{ 'auth.register.hasAccount' | translate }}
+      <a routerLink="/auth/login">{{ 'auth.register.loginLink' | translate }}</a>
+    </p>
+  </div>
+}

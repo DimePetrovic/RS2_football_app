@@ -1,0 +1,9 @@
+<div class="logo-wrap" [class]="'logo-wrap--' + size()">
+  @if (variant() !== 'wordmark') {
+    <img class="logo-icon" src="brand/comeback-icon.svg" alt="Comeback" />
+  }
+  @if (variant() !== 'mark') {
+    <!-- svetla slova za tamnu temu; comeback-wordmark.png (tamna) ostaje za svetle teme -->
+    <img class="logo-wordmark" src="brand/comeback-wordmark-light.png" alt="COME:BACK" />
+  }
+</div>

@@ -1,0 +1,71 @@
+root = true
+
+# Svi fajlovi
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C# fajlovi
+[*.cs]
+indent_size = 4
+
+# C# naming conventions
+dotnet_naming_rule.private_fields_should_be_camel_case.severity = warning
+dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case.style = underscore_camel_case_style
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+dotnet_naming_style.underscore_camel_case_style.capitalization = camel_case
+dotnet_naming_style.underscore_camel_case_style.required_prefix = _
+
+# C# code style
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+csharp_prefer_braces = true:warning
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = when_on_single_line:suggestion
+
+dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_null_propagation = true:warning
+dotnet_style_coalesce_expression = true:warning
+
+# Sortiraj using-e: System prvi, zatim ostali, bez razdvajanja
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# XML fajlovi (.csproj, .props, itd.)
+[*.{csproj,props,targets,xml}]
+indent_size = 2
+
+# JSON fajlovi
+[*.json]
+indent_size = 2
+
+# YAML / Docker
+[*.{yml,yaml}]
+indent_size = 2
+
+# TypeScript / Angular
+[*.{ts,tsx}]
+indent_size = 2
+
+# HTML (Angular templates)
+[*.html]
+indent_size = 2
+
+# SCSS
+[*.scss]
+indent_size = 2
+
+# Markdown
+[*.md]
+trim_trailing_whitespace = false

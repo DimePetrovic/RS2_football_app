@@ -1,0 +1,22 @@
+@use '../auth-page';
+
+.confirm-card {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.confirm-icon {
+  font-size: 64px;
+
+  &--success { color: var(--cb-success); }
+  &--error   { color: var(--cb-error); }
+}
+
+.confirm-label {
+  color: var(--cb-text-muted);
+  font-size: 14px;
+  margin: 0;
+}

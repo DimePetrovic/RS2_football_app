@@ -1,0 +1,97 @@
+services:
+  postgres-auth:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: comeback_auth
+      POSTGRES_USER: comeback
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-comeback_dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-auth-data:/var/lib/postgresql/data
+    networks:
+      - comeback-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U comeback -d comeback_auth"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: comeback
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-comeback_dev}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - comeback-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  # ── Cache ────────────────────────────────────────────────────
+
+  seq:
+    image: datalust/seq:latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_ADMINPASSWORD: "comeback"
+    ports:
+      - "5341:5341"
+      - "5342:80"
+    volumes:
+      - seq-data:/data
+    networks:
+      - comeback-network
+
+  # ── .NET servisi ─────────────────────────────────────────────
+
+  auth-api:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: auth
+        SERVICE_NAME: Auth
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__DefaultConnection: "Host=postgres-auth;Port=5432;Database=comeback_auth;Username=comeback;Password=${POSTGRES_PASSWORD:-comeback_dev}"
+      JwtSettings__Secret: ${JWT_SECRET:-dev-secret-min-32-chars-comeback-auth-2026}
+      JwtSettings__Issuer: comeback-auth
+      JwtSettings__Audience: comeback-api
+      JwtSettings__AccessTokenExpirationMinutes: "15"
+      JwtSettings__RefreshTokenExpirationDays: "7"
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: comeback
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-comeback_dev}
+      Seq__ServerUrl: http://seq:5341
+    ports:
+      - "5104:8080"
+    depends_on:
+      postgres-auth:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - comeback-network
+    restart: on-failure
+
+# ── Volumes ──────────────────────────────────────────────────
+
+volumes:
+  postgres-auth-data:
+  rabbitmq-data:
+  seq-data:
+
+# ── Networks ─────────────────────────────────────────────────
+
+networks:
+  comeback-network:
+    driver: bridge

@@ -1,0 +1,12 @@
+<div class="admin-layout">
+  <header class="admin-top-bar">
+    <span class="admin-top-bar__logo"><app-logo variant="full" size="sm" /><span class="admin-top-bar__tag">ADMIN</span></span>
+    <button mat-icon-button (click)="confirmLogout()" [matTooltip]="'nav.logout' | translate">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </header>
+
+  <main class="admin-layout__content">
+    <router-outlet />
+  </main>
+</div>

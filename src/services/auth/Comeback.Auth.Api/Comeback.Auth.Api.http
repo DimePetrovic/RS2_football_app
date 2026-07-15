@@ -1,0 +1,6 @@
+@Comeback.Auth.Api_HostAddress = http://localhost:5104
+
+GET {{Comeback.Auth.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,17 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY Comeback.sln .
+COPY Directory.Build.props .
+COPY Directory.Packages.props .
+COPY src/building-blocks/ src/building-blocks/
+COPY src/gateway/Comeback.Gateway/ src/gateway/Comeback.Gateway/
+
+RUN dotnet restore src/gateway/Comeback.Gateway/Comeback.Gateway.csproj
+RUN dotnet publish src/gateway/Comeback.Gateway/Comeback.Gateway.csproj \
+    -c Release --no-restore -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "Comeback.Gateway.dll"]

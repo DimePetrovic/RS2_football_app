@@ -1,0 +1,18 @@
+.logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  user-select: none;
+
+  &--sm { .logo-icon { height: 26px; } .logo-wordmark { height: 18px; } }
+  &--md { .logo-icon { height: 34px; } .logo-wordmark { height: 24px; } }
+  &--lg { .logo-icon { height: 46px; } .logo-wordmark { height: 32px; } }
+}
+
+.logo-icon,
+.logo-wordmark {
+  width: auto;
+  display: block;
+  flex-shrink: 0;
+}

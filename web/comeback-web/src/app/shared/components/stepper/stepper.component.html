@@ -1,0 +1,25 @@
+<nav class="cb-stepper" aria-label="Koraci">
+  @for (label of steps(); track label; let i = $index; let last = $last) {
+    <button
+      type="button"
+      class="cb-stepper__step"
+      [class.cb-stepper__step--active]="i === current()"
+      [class.cb-stepper__step--done]="i < current()"
+      [disabled]="i >= current()"
+      (click)="onSelect(i)"
+    >
+      <span class="cb-stepper__circle">
+        @if (i < current()) {
+          <span class="material-icons">check</span>
+        } @else {
+          {{ i + 1 }}
+        }
+      </span>
+      <span class="cb-stepper__label">{{ label }}</span>
+    </button>
+
+    @if (!last) {
+      <span class="cb-stepper__line" [class.cb-stepper__line--done]="i < current()"></span>
+    }
+  }
+</nav>

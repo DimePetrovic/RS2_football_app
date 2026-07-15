@@ -1,0 +1,33 @@
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--cb-bg);
+
+  &__header {
+    display: flex;
+    justify-content: center;
+    padding: 32px 24px 0;
+  }
+
+  &__main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  &__footer {
+    padding: 24px;
+    text-align: center;
+  }
+}
+
+.tagline {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--cb-text-muted);
+  margin: 0;
+}

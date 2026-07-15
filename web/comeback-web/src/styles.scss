@@ -1,0 +1,288 @@
+@use '@angular/material' as mat;
+// SVG country flags — only the 4x3 variant (the 1x1 set collides with it in the
+// bundler because both use the same SVG file names).
+@use 'flag-icons/sass/flag-icons' with (
+  $flag-icons-path: 'flag-icons/flags',
+  $flag-icons-use-square: false
+);
+
+// Tailwind
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// ── Material M3 dark theme ──────────────────────────────────────
+html {
+  @include mat.theme((
+    color: (
+      primary: mat.$yellow-palette,
+      theme-type: dark,
+    ),
+    typography: (
+      brand-family: 'Oswald, sans-serif',
+      plain-family: 'Inter, sans-serif',
+    ),
+    density: 0,
+  ));
+}
+
+// ── CSS design tokens ───────────────────────────────────────────
+// Aligned with "Comeback — Brand specification" (Concrete Dark, default theme)
+:root {
+  // Neutrals / surfaces
+  --cb-bg:            #181B20;  // base (background)
+  --cb-surface:       #22252C;  // cards, inputs
+  --cb-surface-2:     #282C34;  // more prominent cards
+  --cb-border:        #3D424B;  // line / border
+
+  // Accent — Volt
+  --cb-primary:       #C7F24E;  // Volt (fill on dark surfaces)
+  --cb-primary-deep:  #5F8C14;  // Volt Deep (text/colon on light)
+  --cb-primary-dim:   #5F8C14;  // alias (kept for compatibility)
+  --cb-amber:         #F7B75C;  // spotlight / warm accent
+  --cb-blue:          #3D88F2;  // court blue
+
+  // Text
+  --cb-text:          #F5F5F5;
+  --cb-text-secondary:#CFD1D5;
+  --cb-text-muted:    #8A8D93;
+
+  // Semantic
+  --cb-success:       #34C759;  // win / confirmed
+  --cb-error:         #FF5340;  // loss / own goal
+  --cb-warning:       #F7B75C;  // warning (amber)
+  --cb-pending:       #8A8D93;  // pending
+
+  // Text on the Volt surface (buttons, score pill)
+  --cb-on-primary:    #181B20;
+
+  // Fonts
+  --cb-font-display:  'Oswald', sans-serif;
+  --cb-font-body:     'Inter', sans-serif;
+  --cb-font-mono:     'JetBrains Mono', monospace;
+
+  // Radii
+  --cb-radius:        14px;  // buttons, cards
+  --cb-radius-sm:     13px;  // inputs
+  --cb-radius-pill:   999px;
+
+  --cb-nav-height:    64px;
+  --cb-topbar-height: 52px;
+}
+
+// Volt as the Material system accent (form-field focus, checkbox, radio, slider…)
+html {
+  --mat-sys-primary:    var(--cb-primary);
+  --mat-sys-on-primary: var(--cb-on-primary);
+}
+
+// ── Global reset ────────────────────────────────────────────────
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--cb-bg);
+  color: var(--cb-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+// ── Material overrides ──────────────────────────────────────────
+.mat-mdc-form-field {
+  width: 100%;
+  // The floated outline label rises above the field's top border; reserve room so the
+  // container/wrapper doesn't clip its upper half.
+  padding-top: 8px;
+}
+
+// The focus rule below sets border-width on all sides of each notched-outline segment; with
+// Preflight's border-style: solid that makes the inner (facing) borders show as stray vertical
+// lines inside the field. Keep only the outer box by dropping the inner borders.
+.mdc-notched-outline__leading { border-right: none !important; }
+.mdc-notched-outline__notch { border-left: none !important; border-right: none !important; }
+.mdc-notched-outline__trailing { border-left: none !important; }
+
+// Let the wrapper show the floated outline label (its upper half sits above the wrapper).
+.mat-mdc-text-field-wrapper {
+  overflow: visible;
+}
+
+// ── Buttons (per brand spec) ────────────────────────────────────
+// Primary: Volt fill, dark text, radius ~14px, bold
+.mat-mdc-raised-button.cb-btn-primary {
+  background-color: var(--cb-primary) !important;
+  color: var(--cb-on-primary) !important;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  height: 48px;
+  border-radius: var(--cb-radius) !important;
+  width: 100%;
+  transition: transform 0.08s ease;
+
+  &:active { transform: scale(0.98); }         // press state
+  &[disabled] {
+    background-color: var(--cb-surface-2) !important;
+    color: #5b5e64 !important;
+  }
+}
+
+// Secondary: transparent background, white text, border
+.mat-mdc-button.cb-btn-secondary,
+.mat-mdc-stroked-button.cb-btn-secondary {
+  background-color: transparent !important;
+  color: var(--cb-text) !important;
+  border: 1px solid var(--cb-border) !important;
+  font-weight: 600;
+  height: 48px;
+  border-radius: var(--cb-radius) !important;
+  transition: transform 0.08s ease;
+  &:active { transform: scale(0.98); }
+}
+
+// Ghost / outline: transparent background, Volt text and border
+.mat-mdc-button.cb-btn-ghost {
+  color: var(--cb-primary) !important;
+  font-weight: 600;
+  transition: transform 0.08s ease;
+  &:active { transform: scale(0.98); }
+}
+
+// Pill: Volt fill, full radius
+.mat-mdc-raised-button.cb-btn-pill {
+  background-color: var(--cb-primary) !important;
+  color: var(--cb-on-primary) !important;
+  font-weight: 700;
+  border-radius: var(--cb-radius-pill) !important;
+  transition: transform 0.08s ease;
+  &:active { transform: scale(0.98); }
+}
+
+// ── Forms ───────────────────────────────────────────────────────
+// Focus border turns Volt (spec: 1.5px)
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--cb-primary) !important;
+  border-width: 1.5px !important;
+}
+
+// Tailwind Preflight sets html { line-height: 1.5 }; the MDC floating label inherits it and
+// renders too tall, clipping the outline label at the top (most visible on the first field in a
+// dialog, where the floated label sits near the container edge). Pin it to its natural line-height.
+.mat-mdc-floating-label,
+.mdc-floating-label {
+  line-height: normal !important;
+}
+
+
+
+// ── Chips / segmented (filters, selection) ──────────────────────────
+.cb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--cb-radius-pill);
+  border: 1px solid var(--cb-border);
+  background: var(--cb-surface);
+  color: var(--cb-text-secondary);
+  font-family: var(--cb-font-body);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.08s ease, border-color 0.15s ease;
+
+  &:active { transform: scale(0.98); }
+  &.cb-chip--active {
+    border-color: var(--cb-primary);
+    background: color-mix(in srgb, var(--cb-primary) 14%, transparent);
+    color: var(--cb-primary);
+  }
+}
+
+// ── Wizard navigation (Back / Next) — shared for multistep forms
+.cb-wizard-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+
+  &__back { margin-right: auto; }
+
+  .mat-mdc-button,
+  .mat-mdc-raised-button {
+    height: 46px;
+    min-width: 130px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  }
+}
+
+// ── Utility: monospace for all numbers (ELO, XP, result, statistics)
+.cb-mono {
+  font-family: var(--cb-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+// ── Scoreline (brand symbol — result as a pill, e.g. 3:2) ───────
+.cb-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--cb-font-mono);
+  font-weight: 800;
+  color: var(--cb-on-primary);
+  background: var(--cb-primary);
+  padding: 4px 12px;
+  border-radius: var(--cb-radius-sm);
+  letter-spacing: 0.02em;
+}
+.cb-score__sep { color: var(--cb-on-primary); opacity: 0.85; }
+
+.mat-mdc-snack-bar-container {
+  &.cb-snack-error .mdc-snackbar__surface {
+    background-color: var(--cb-error) !important;
+  }
+  &.cb-snack-success .mdc-snackbar__surface {
+    background-color: var(--cb-success) !important;
+  }
+}
+
+// ── SVG country flags (flag-icons) ──────────────────────────────
+.player-badge__flag,
+.profile-name__flag,
+.country-flag {
+  display: inline-block;
+  border-radius: 2px;
+  vertical-align: baseline;
+}
+.player-badge__flag { margin-left: 6px; font-size: 0.85em; }
+.profile-name__flag { margin-left: 8px; font-size: 0.6em; vertical-align: middle; }
+.country-flag { margin-right: 6px; }
+
+// ── Tooltips (brand look for MatTooltip) ─────────────────────────
+.mat-mdc-tooltip .mdc-tooltip__surface {
+  background: var(--cb-surface-2) !important;
+  color: var(--cb-text) !important;
+  border: 1px solid var(--cb-border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: var(--cb-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
