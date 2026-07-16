@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; background: #0f0f0f; color: #f0f0f0; margin: 0; padding: 40px 20px; }
+    .container { max-width: 520px; margin: 0 auto; background: #1a1a1a; border-radius: 12px; padding: 40px; }
+    .logo { font-size: 28px; font-weight: bold; color: #f5c842; letter-spacing: 2px; margin-bottom: 32px; }
+    h1 { font-size: 22px; margin: 0 0 16px; }
+    p { color: #aaa; line-height: 1.6; margin: 0 0 24px; }
+    .btn { display: inline-block; background: #f5c842; color: #0f0f0f; font-weight: bold;
+           text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 15px; }
+    .footer { margin-top: 32px; font-size: 12px; color: #555; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">COMEBACK</div>
+    <h1>Potvrdi svoju email adresu</h1>
+    <p>Zdravo <strong>{{username}}</strong>,</p>
+    <p>Hvala što si se registrovao na Comeback. Klikni na dugme ispod da aktiviraš nalog i počneš da igraš.</p>
+    <a href="{{confirmUrl}}" class="btn">Aktiviraj nalog</a>
+    <div class="footer">
+      <p>Link važi 24 sata. Ako nisi ti napravio ovaj nalog, ignoriši ovaj email.</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -17,6 +17,24 @@ services:
       timeout: 5s
       retries: 5
 
+  postgres-notification:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: comeback_notification
+      POSTGRES_USER: comeback
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-comeback_dev}
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-notification-data:/var/lib/postgresql/data
+    networks:
+      - comeback-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U comeback -d comeback_notification"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
     environment:
@@ -83,10 +101,48 @@ services:
       - comeback-network
     restart: on-failure
 
+  notification-api:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: notification
+        SERVICE_NAME: Notification
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Services__ProfileApi: http://profile-api:8080
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__DefaultConnection: "Host=postgres-notification;Port=5432;Database=comeback_notification;Username=comeback;Password=${POSTGRES_PASSWORD:-comeback_dev}"
+      JwtSettings__Secret: ${JWT_SECRET:-dev-secret-min-32-chars-comeback-auth-2026}
+      JwtSettings__Issuer: comeback-auth
+      JwtSettings__Audience: comeback-api
+      Smtp__Host: maildev
+      Smtp__Port: "1025"
+      Smtp__FromEmail: noreply@comeback.app
+      Smtp__FromName: Comeback
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: comeback
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-comeback_dev}
+      Frontend__BaseUrl: http://localhost:4200
+      Seq__ServerUrl: http://seq:5341
+    ports:
+      - "5410:8080"
+    depends_on:
+      postgres-notification:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      maildev:
+        condition: service_started
+    networks:
+      - comeback-network
+    restart: on-failure
+
 # ── Volumes ──────────────────────────────────────────────────
 
 volumes:
   postgres-auth-data:
+  postgres-notification-data:
   rabbitmq-data:
   seq-data:
 

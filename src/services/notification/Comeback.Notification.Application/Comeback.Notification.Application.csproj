@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\building-blocks\Comeback.BuildingBlocks\Comeback.BuildingBlocks.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- User-facing email content lives in template assets, never as string literals in code. -->
+    <EmbeddedResource Include="Features\Emails\SendVerificationEmail\Templates\VerificationEmail.html">
+      <LogicalName>VerificationEmail.html</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Features\Emails\SendVerificationEmail\Templates\VerificationEmail.subject.txt">
+      <LogicalName>VerificationEmail.subject.txt</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
