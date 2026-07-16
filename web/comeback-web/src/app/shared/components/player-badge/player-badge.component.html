@@ -1,0 +1,21 @@
+<span class="player-badge player-badge--{{ size }}"
+  [class.player-badge--plain]="!username"
+  [routerLink]="userId && username ? ['/players', userId] : null"
+  [class.player-badge--link]="!!userId && !!username"
+  (click)="userId && username ? $event.stopPropagation() : null">
+  <span class="player-badge__avatar">
+    @if (avatarUrl) {
+      <img [src]="avatarUrl" [alt]="username ?? name ?? ''" />
+    } @else {
+      {{ initials() }}
+    }
+  </span>
+  <span class="player-badge__text">
+    @if (name) {
+      <span class="player-badge__name">{{ name }}@if (flag()) { <span class="player-badge__flag {{ flag() }}" [matTooltip]="countryName()"></span> }</span>
+    }
+    @if (username) {
+      <span class="player-badge__username">&#64;{{ username }}</span>
+    }
+  </span>
+</span>

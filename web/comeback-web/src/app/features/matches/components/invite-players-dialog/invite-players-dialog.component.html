@@ -1,0 +1,59 @@
+<h2 mat-dialog-title>{{ 'match.invite.title' | translate }}</h2>
+
+<mat-dialog-content class="invite-players">
+  <app-player-search-field class="invite-players__field"
+    labelKey="match.invite.searchPlaceholder"
+    [excludedIds]="excludedIds()"
+    (playerSelected)="addInvitee($event)" />
+
+  @if (invitees().length > 0) {
+    <ul class="invite-players__list">
+      @for (inv of invitees(); track inv.userId) {
+        <li class="invite-players__chip">
+          {{ inv.displayName }}
+          <button type="button" mat-icon-button (click)="removeInvitee(inv.userId)">
+            <mat-icon>close</mat-icon>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+
+  <mat-form-field appearance="outline" class="invite-players__field">
+    <mat-label>{{ 'match.guests.inputLabel' | translate }}</mat-label>
+    <input matInput
+      [value]="guestInput()"
+      (input)="guestInput.set($any($event.target).value)"
+      (keydown.enter)="$event.preventDefault(); addGuest()"
+      [placeholder]="'match.guests.inputPlaceholder' | translate" />
+    <button matSuffix mat-icon-button type="button" (click)="addGuest()" [disabled]="!guestInput().trim()">
+      <mat-icon>add</mat-icon>
+    </button>
+    <mat-hint>{{ 'match.guests.hint' | translate }}</mat-hint>
+  </mat-form-field>
+
+  @if (guestNames().length > 0) {
+    <ul class="invite-players__list">
+      @for (name of guestNames(); track $index) {
+        <li class="invite-players__chip">
+          <mat-icon class="invite-players__guest-icon">person_outline</mat-icon>
+          {{ name }}
+          <button type="button" mat-icon-button (click)="removeGuest($index)">
+            <mat-icon>close</mat-icon>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (error()) {
+    <p class="invite-players__error">{{ error() }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">{{ 'common.cancel' | translate }}</button>
+  <button mat-raised-button color="primary" [disabled]="!isValid() || submitting()" (click)="submit()">
+    {{ 'match.invite.submit' | translate }}
+  </button>
+</mat-dialog-actions>

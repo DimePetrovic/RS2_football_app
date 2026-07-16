@@ -1,0 +1,92 @@
+<h2 mat-dialog-title>{{ 'match.edit.title' | translate }}</h2>
+
+<mat-dialog-content class="edit-match">
+  <app-stepper
+    [steps]="steps"
+    [current]="currentStep()"
+    (stepSelected)="goToStep($event)"
+  />
+
+  @if (currentStep() === 0) {
+    <mat-form-field appearance="outline" class="edit-match__field">
+      <mat-label>{{ 'match.edit.matchTitle' | translate }}</mat-label>
+      <input matInput [value]="title()" (input)="title.set($any($event.target).value)" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="edit-match__field">
+      <mat-label>{{ 'match.edit.location' | translate }}</mat-label>
+      <input matInput [value]="location()" (input)="location.set($any($event.target).value)" />
+    </mat-form-field>
+  }
+
+  @if (currentStep() === 1) {
+    <div class="edit-match__row">
+      <mat-form-field appearance="outline" class="edit-match__field">
+        <mat-label>{{ 'match.edit.date' | translate }}</mat-label>
+        <input matInput [matDatepicker]="picker"
+          [value]="matchDate()"
+          (dateChange)="matchDate.set($event.value)"
+          [min]="minDate"
+          readonly
+          (click)="picker.open()"
+          required />
+        <mat-datepicker-toggle matIconSuffix [for]="picker" />
+        <mat-datepicker #picker />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="edit-match__field edit-match__time-field">
+        <mat-label>{{ 'match.edit.hour' | translate }}</mat-label>
+        <mat-select [value]="matchHour()" (selectionChange)="matchHour.set($event.value)">
+          @for (h of hourOptions; track h) {
+            <mat-option [value]="h">{{ h.toString().padStart(2, '0') }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="edit-match__field edit-match__time-field">
+        <mat-label>{{ 'match.edit.minute' | translate }}</mat-label>
+        <mat-select [value]="matchMinute()" (selectionChange)="matchMinute.set($event.value)">
+          @for (m of minuteOptions; track m) {
+            <mat-option [value]="m">{{ m.toString().padStart(2, '0') }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="edit-match__row edit-match__row--duration">
+      <mat-form-field appearance="outline" class="edit-match__field">
+        <mat-label>{{ 'match.edit.duration' | translate }}</mat-label>
+        <input matInput type="number" min="10" max="300"
+          [value]="durationMinutes()"
+          (input)="durationMinutes.set(+$any($event.target).value)"
+          [disabled]="durationUnknown()" />
+      </mat-form-field>
+
+      <mat-checkbox [checked]="durationUnknown()" (change)="durationUnknown.set($event.checked)">
+        {{ 'match.edit.durationUnknown' | translate }}
+      </mat-checkbox>
+    </div>
+  }
+
+  @if (error()) {
+    <p class="edit-match__error">{{ error() }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="cb-wizard-nav">
+  @if (currentStep() === 0) {
+    <button mat-button class="cb-btn-secondary cb-wizard-nav__back" (click)="cancel()">
+      {{ 'common.cancel' | translate }}
+    </button>
+    <button mat-raised-button class="cb-btn-primary" [disabled]="!step1Valid()" (click)="next()">
+      {{ 'common.next' | translate }} <mat-icon>arrow_forward</mat-icon>
+    </button>
+  } @else {
+    <button mat-button class="cb-btn-secondary cb-wizard-nav__back" (click)="prev()">
+      <mat-icon>arrow_back</mat-icon> {{ 'common.back' | translate }}
+    </button>
+    <button mat-raised-button class="cb-btn-primary" [disabled]="!isValid() || submitting()" (click)="submit()">
+      {{ 'common.save' | translate }}
+    </button>
+  }
+</mat-dialog-actions>

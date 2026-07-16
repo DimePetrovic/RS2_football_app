@@ -1,0 +1,31 @@
+.edit-match {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 320px;
+
+  &__field {
+    width: 100%;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 8px;
+    align-items: center;
+  }
+
+  &__time-field {
+    min-width: 0;
+  }
+
+  &__row--duration {
+    grid-template-columns: 1fr auto;
+  }
+
+  &__error {
+    color: var(--mat-sys-error, crimson);
+    font-size: 0.85rem;
+    margin: 0;
+  }
+}

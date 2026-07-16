@@ -1,0 +1,129 @@
+.my-matches {
+  padding: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  &__title {
+    margin: 0;
+    font-family: var(--cb-font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  &__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 20px;
+    height: 44px;
+
+    mat-icon { font-size: 20px; width: 20px; height: 20px; }
+  }
+
+  &__empty-cta {
+    width: auto;
+    min-width: 200px;
+    padding: 0 28px;
+  }
+
+  &__loading,
+  &__error,
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 16px;
+    gap: 12px;
+    color: var(--cb-text-secondary);
+    text-align: center;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+    }
+  }
+}
+
+.match-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.match-card {
+  background: var(--cb-surface);
+  border: 1px solid var(--cb-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--cb-surface-2);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+
+  &__title {
+    font-weight: 600;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &--scheduled { background: color-mix(in srgb, var(--cb-primary) 15%, transparent); color: var(--cb-primary); }
+    &--resultoverdue { background: color-mix(in srgb, orange 18%, transparent); color: orange; }
+    &--resultsubmitted { background: color-mix(in srgb, orange 15%, transparent); color: darkorange; }
+    &--resultconfirmed { background: color-mix(in srgb, green 15%, transparent); color: green; }
+    &--missed { background: color-mix(in srgb, red 12%, transparent); color: crimson; }
+    &--cancelled { background: color-mix(in srgb, red 12%, transparent); color: crimson; }
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__detail {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--cb-text-secondary);
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}

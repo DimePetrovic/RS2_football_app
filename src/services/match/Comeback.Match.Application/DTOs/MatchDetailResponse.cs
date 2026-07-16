@@ -1,0 +1,28 @@
+namespace Comeback.Match.Application.DTOs;
+
+public sealed record MatchDetailResponse(
+    Guid Id,
+    string Title,
+    string Type,
+    string Status,
+    Guid OrganizerUserId,
+    string? Location,
+    DateTime StartsAt,
+    int? DurationMinutes,
+    int PlayersPerTeam,
+    int MaxSubstitutes,
+    int? HomeScore,
+    int? AwayScore,
+    DateTime? ResultSubmittedAt,
+    DateTime CreatedAt,
+    IReadOnlyList<ParticipantResponse> Participants,
+    IReadOnlyList<GoalResponse> Goals,
+    Guid? GroupId,
+    string? GroupName,
+    Guid? OpponentGroupId,
+    string? OpponentGroupName,
+    Guid? OpponentGroupCaptainUserId,
+    string? OpponentGroupCaptainDisplayName,
+    string? OpponentGroupInviteStatus,
+    Guid? SecondOrganizerUserId,
+    int? MyXpChange);
