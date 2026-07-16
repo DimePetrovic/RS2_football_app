@@ -1,0 +1,55 @@
+<div class="my-matches">
+  <div class="my-matches__header">
+    <h2 class="my-matches__title">{{ 'match.myMatches.title' | translate }}</h2>
+    <button mat-raised-button class="cb-btn-pill my-matches__cta" [routerLink]="'/matches/create'">
+      <mat-icon>add</mat-icon>
+      {{ 'match.myMatches.newMatch' | translate }}
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="my-matches__loading">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else if (error()) {
+    <div class="my-matches__error">
+      <p>{{ 'match.myMatches.loadError' | translate }}</p>
+      <button mat-button (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (matches().length === 0) {
+    <div class="my-matches__empty">
+      <mat-icon>sports_soccer</mat-icon>
+      <p>{{ 'match.myMatches.empty' | translate }}</p>
+      <button mat-raised-button class="cb-btn-primary my-matches__empty-cta" [routerLink]="'/matches/create'">{{ 'match.myMatches.create' | translate }}</button>
+    </div>
+  } @else {
+    <ul class="match-list">
+      @for (m of matches(); track m.id) {
+        <li class="match-card" [routerLink]="['/matches', m.id]">
+          <div class="match-card__header">
+            <span class="match-card__title">{{ m.title }}</span>
+            <span class="match-card__status match-card__status--{{ m.status.toLowerCase() }}">
+              {{ m.status | matchStatus }}
+            </span>
+          </div>
+          <div class="match-card__details">
+            <span class="match-card__detail">
+              <mat-icon>calendar_today</mat-icon>
+              {{ m.startsAt | date:'d. MMM yyyy, HH:mm' }}
+            </span>
+            @if (m.location) {
+              <span class="match-card__detail">
+                <mat-icon>location_on</mat-icon>
+                {{ m.location }}
+              </span>
+            }
+            <span class="match-card__detail">
+              <mat-icon>group</mat-icon>
+              {{ 'match.myMatches.playersCount' | translate: { accepted: m.acceptedCount, total: m.playersPerTeam * 2 } }}
+            </span>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</div>

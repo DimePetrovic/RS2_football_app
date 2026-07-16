@@ -1,0 +1,316 @@
+<div class="create-match">
+  <div class="create-match__back">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+  </div>
+  <h2 class="create-match__title">{{ 'match.create.title' | translate }}</h2>
+
+  <app-stepper
+    [steps]="steps"
+    [current]="currentStep()"
+    (stepSelected)="goToStep($event)"
+  />
+
+  <form class="create-match__form" (ngSubmit)="submit()">
+
+    <!-- ── Step 1: Details ────────────────────────────────────── -->
+    @if (currentStep() === 0) {
+      <mat-form-field appearance="outline" class="create-match__field">
+        <mat-label>{{ 'match.create.location' | translate }}</mat-label>
+        <input matInput [value]="location()" (input)="location.set($any($event.target).value)"
+          [placeholder]="'match.create.locationPlaceholder' | translate" required />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="create-match__field">
+        <mat-label>{{ 'match.create.nameLabel' | translate }}</mat-label>
+        <input matInput [value]="title()" (input)="title.set($any($event.target).value)"
+          [placeholder]="'match.create.namePlaceholder' | translate" />
+        @if (location().trim()) {
+          <mat-hint>{{ 'match.create.nameHint' | translate: { title: resolvedTitle() } }}</mat-hint>
+        }
+      </mat-form-field>
+    }
+
+    <!-- ── Step 2: Schedule ─────────────────────────────────────── -->
+    @if (currentStep() === 1) {
+      <div class="create-match__row create-match__row--datetime">
+        <mat-form-field appearance="outline" class="create-match__field">
+          <mat-label>{{ 'match.create.date' | translate }}</mat-label>
+          <input matInput [matDatepicker]="picker"
+            [value]="matchDate()"
+            (dateChange)="matchDate.set($event.value)"
+            [min]="minDate"
+            readonly
+            (click)="picker.open()"
+            placeholder="dd/MM/yyyy"
+            required />
+          <mat-datepicker-toggle matIconSuffix [for]="picker" />
+          <mat-datepicker #picker />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="create-match__field create-match__time-field">
+          <mat-label>{{ 'match.create.hour' | translate }}</mat-label>
+          <mat-select [value]="matchHour()" (selectionChange)="matchHour.set($event.value)">
+            @for (h of hourOptions; track h) {
+              <mat-option [value]="h">{{ h.toString().padStart(2, '0') }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="create-match__field create-match__time-field">
+          <mat-label>{{ 'match.create.minute' | translate }}</mat-label>
+          <mat-select [value]="matchMinute()" (selectionChange)="matchMinute.set($event.value)">
+            @for (m of minuteOptions; track m) {
+              <mat-option [value]="m">{{ m.toString().padStart(2, '0') }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="create-match__row">
+        <mat-form-field appearance="outline" class="create-match__field">
+          <mat-label>{{ 'match.create.duration' | translate }}</mat-label>
+          <input matInput type="number" min="10" max="300"
+            [value]="durationMinutes()"
+            (input)="durationMinutes.set(+$any($event.target).value)"
+            [disabled]="durationUnknown()" />
+        </mat-form-field>
+
+        <div class="create-match__unknown-duration">
+          <mat-checkbox [checked]="durationUnknown()" (change)="durationUnknown.set($event.checked)">
+            {{ 'match.create.durationUnknown' | translate }}
+          </mat-checkbox>
+        </div>
+
+        <mat-form-field appearance="outline" class="create-match__field">
+          <mat-label>{{ 'match.create.playersPerTeam' | translate }}</mat-label>
+          <mat-select [value]="playersPerTeam()" (selectionChange)="playersPerTeam.set($event.value)">
+            @for (n of [3, 4, 5, 6, 7, 8, 9, 10]; track n) {
+              <mat-option [value]="n">{{ n }}+1</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    }
+
+    <!-- ── Step 3: Type and players ───────────────────────────────── -->
+    @if (currentStep() === 2) {
+      <div class="create-match__section">
+        <div class="create-match__section-title">{{ 'match.create.typeLabel' | translate }}</div>
+        <div class="match-type-tabs">
+          <button type="button" class="match-type-tab" [class.match-type-tab--active]="matchType() === 0"
+            (click)="setMatchType(0)">{{ 'match.create.typeIndependent' | translate }}</button>
+          <button type="button" class="match-type-tab" [class.match-type-tab--active]="matchType() === 1"
+            (click)="setMatchType(1)">{{ 'match.create.typeGroup' | translate }}</button>
+          <button type="button" class="match-type-tab" [class.match-type-tab--active]="matchType() === 2"
+            (click)="setMatchType(2)">{{ 'match.create.typeGroupVsGroup' | translate }}</button>
+        </div>
+
+        @if (matchType() === 1 || matchType() === 2) {
+          <mat-form-field appearance="outline" class="create-match__field">
+            <mat-label>{{ matchType() === 2 ? ('match.create.yourGroup' | translate) : ('match.create.group' | translate) }}</mat-label>
+            <mat-select [value]="selectedGroupId()" (selectionChange)="onGroupSelected($event.value)">
+              @for (g of myGroups(); track g.id) {
+                <mat-option [value]="g.id">{{ g.name }} ({{ g.memberCount }})</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          @if (myGroups().length === 0) {
+            <p class="create-match__hint">{{ 'match.create.noGroups' | translate }}</p>
+          }
+        }
+
+        @if (matchType() === 2) {
+          @if (!selectedOpponentGroup()) {
+            <mat-form-field appearance="outline" class="create-match__field">
+              <mat-label>{{ 'match.create.searchOpponentGroup' | translate }}</mat-label>
+              <input matInput
+                [value]="opponentGroupQuery()"
+                (input)="onOpponentGroupSearch($any($event.target).value)"
+                [matAutocomplete]="groupAuto"
+                [placeholder]="'match.create.groupNamePlaceholder' | translate" />
+              <mat-autocomplete #groupAuto (optionSelected)="selectOpponentGroup($event.option.value)">
+                @for (g of opponentGroupResults(); track g.id) {
+                  <mat-option [value]="g">
+                    {{ g.name }}
+                    <span class="search-username">{{ 'match.create.memberCount' | translate: { count: g.memberCount } }}</span>
+                  </mat-option>
+                }
+              </mat-autocomplete>
+            </mat-form-field>
+          } @else {
+            <div class="opponent-group-chip">
+              <span>{{ selectedOpponentGroup()!.name }}</span>
+              <button type="button" mat-icon-button (click)="clearOpponentGroup()">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="create-match__section">
+        <div class="create-match__section-title">
+          {{ matchType() === 0 ? ('match.create.invitePlayers' | translate) : ('match.create.inviteIndividual' | translate) }}
+        </div>
+
+        <app-player-search-field class="create-match__field"
+          labelKey="match.create.searchPlayer"
+          [excludedIds]="searchExcludedIds()"
+          (playerSelected)="addInvitee($event)" />
+
+        @if (invitees().length > 0) {
+          <ul class="invitee-list">
+            @for (inv of invitees(); track inv.userId) {
+              <li class="invitee-chip">
+                {{ inv.displayName }}
+                <button type="button" mat-icon-button (click)="removeInvitee(inv.userId)">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <div class="create-match__section">
+        <div class="create-match__section-title">{{ 'match.create.guestsSection' | translate }}</div>
+
+        <mat-form-field appearance="outline" class="create-match__field">
+          <mat-label>{{ 'match.create.guestNameLabel' | translate }}</mat-label>
+          <input matInput
+            [value]="guestInput()"
+            (input)="guestInput.set($any($event.target).value)"
+            (keydown.enter)="$event.preventDefault(); addGuest()"
+            [placeholder]="'match.create.guestPlaceholder' | translate" />
+          <button matSuffix mat-icon-button type="button" (click)="addGuest()" [disabled]="!guestInput().trim()">
+            <mat-icon>add</mat-icon>
+          </button>
+          <mat-hint>{{ 'match.create.guestHint' | translate }}</mat-hint>
+        </mat-form-field>
+
+        @if (guestNames().length > 0) {
+          <ul class="invitee-list">
+            @for (name of guestNames(); track $index) {
+              <li class="invitee-chip invitee-chip--guest">
+                <mat-icon>person_outline</mat-icon>
+                {{ name }}
+                <button type="button" mat-icon-button (click)="removeGuest($index)">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
+
+    <!-- ── Step 4: Confirm ────────────────────────────────────── -->
+    @if (currentStep() === 3) {
+      <div class="summary">
+        <div class="summary__row">
+          <mat-icon>edit</mat-icon>
+          <div class="summary__body">
+            <span class="summary__label">{{ 'match.create.summaryName' | translate }}</span>
+            <span class="summary__value">{{ resolvedTitle() }}</span>
+          </div>
+        </div>
+
+        @if (location()) {
+          <div class="summary__row">
+            <mat-icon>location_on</mat-icon>
+            <div class="summary__body">
+              <span class="summary__label">{{ 'match.create.location' | translate }}</span>
+              <span class="summary__value">{{ location() }}</span>
+            </div>
+          </div>
+        }
+
+        <div class="summary__row">
+          <mat-icon>event</mat-icon>
+          <div class="summary__body">
+            <span class="summary__label">{{ 'match.create.dateTime' | translate }}</span>
+            <span class="summary__value cb-mono">
+              {{ startsAtPreview() ? (startsAtPreview() | date:'d. MMM yyyy, HH:mm') : '—' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="summary__row">
+          <mat-icon>timer</mat-icon>
+          <div class="summary__body">
+            <span class="summary__label">{{ 'match.create.durationLabel' | translate }}</span>
+            <span class="summary__value cb-mono">
+              {{ durationUnknown() ? ('match.create.unknown' | translate) : durationMinutes() + ' min' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="summary__row">
+          <mat-icon>groups</mat-icon>
+          <div class="summary__body">
+            <span class="summary__label">{{ 'match.create.format' | translate }}</span>
+            <span class="summary__value"><span class="cb-mono">{{ playersPerTeam() }}+1</span> · {{ matchTypeLabel() }}</span>
+          </div>
+        </div>
+
+        @if (selectedGroupName()) {
+          <div class="summary__row">
+            <mat-icon>shield</mat-icon>
+            <div class="summary__body">
+              <span class="summary__label">{{ matchType() === 2 ? ('match.create.yourGroup' | translate) : ('match.create.group' | translate) }}</span>
+              <span class="summary__value">
+                {{ selectedGroupName() }}
+                @if (selectedOpponentGroup()) { <span class="summary__vs">vs</span> {{ selectedOpponentGroup()!.name }} }
+              </span>
+            </div>
+          </div>
+        }
+
+        <div class="summary__row">
+          <mat-icon>person_add</mat-icon>
+          <div class="summary__body">
+            <span class="summary__label">{{ 'match.create.invitedCount' | translate }}</span>
+            <span class="summary__value cb-mono">{{ invitees().length }}</span>
+          </div>
+        </div>
+
+        @if (guestNames().length > 0) {
+          <div class="summary__row">
+            <mat-icon>person_outline</mat-icon>
+            <div class="summary__body">
+              <span class="summary__label">{{ 'match.create.guestsSection' | translate }}</span>
+              <span class="summary__value">{{ guestNames().join(', ') }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (error()) {
+      <p class="create-match__error">{{ error() }}</p>
+    }
+
+    <!-- ── Navigation ──────────────────────────────────────────── -->
+    <div class="create-match__nav">
+      @if (currentStep() > 0) {
+        <button type="button" mat-button class="cb-btn-secondary create-match__nav-back" (click)="prev()">
+          <mat-icon>arrow_back</mat-icon> {{ 'common.back' | translate }}
+        </button>
+      }
+
+      @if (currentStep() < steps.length - 1) {
+        <button type="button" mat-raised-button class="cb-btn-primary create-match__nav-next"
+          [disabled]="!canProceed()" (click)="next()">
+          {{ 'match.create.next' | translate }} <mat-icon>arrow_forward</mat-icon>
+        </button>
+      } @else {
+        <button type="submit" mat-raised-button class="cb-btn-primary create-match__nav-next"
+          [disabled]="!isValid() || submitting()">
+          @if (submitting()) { {{ 'match.create.submitting' | translate }} } @else { {{ 'match.create.submit' | translate }} }
+        </button>
+      }
+    </div>
+  </form>
+</div>

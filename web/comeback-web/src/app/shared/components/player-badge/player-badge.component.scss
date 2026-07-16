@@ -1,0 +1,84 @@
+.player-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  // Framed "chip" look — the badge reads as one consistent entity everywhere.
+  background: var(--cb-surface-2);
+  border: 1px solid var(--cb-border);
+  border-radius: var(--cb-radius-pill);
+  padding: 4px 14px 4px 5px;
+  transition: border-color 0.15s ease;
+
+  &--link {
+    cursor: pointer;
+    &:hover { border-color: var(--cb-primary); }
+  }
+
+  &__avatar {
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--cb-surface-2);
+    color: var(--cb-text-muted);
+    font-weight: 600;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.25;
+  }
+
+  &__name {
+    color: var(--cb-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__username {
+    color: var(--cb-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // ── Sizes ──
+  &--md {
+    .player-badge__avatar { width: 36px; height: 36px; font-size: 12px; }
+    .player-badge__name { font-size: 14px; }
+    .player-badge__username { font-size: 12px; }
+  }
+
+  &--sm {
+    gap: 6px;
+    padding: 3px 12px 3px 4px;
+
+    .player-badge__avatar { width: 26px; height: 26px; font-size: 10px; }
+    .player-badge__name { font-size: 13px; }
+    .player-badge__username { font-size: 11px; }
+  }
+}
+
+// Guests (no account, no username) are not an entity in the system — no chip frame, no link.
+.player-badge--plain {
+  background: transparent;
+  border-color: transparent;
+  padding-left: 0;
+}
+
+.player-badge__flag {
+  margin-left: 5px;
+  font-size: 0.95em;
+}

@@ -1,0 +1,375 @@
+<div class="match-detail">
+  <div class="match-detail__back">
+    <button mat-icon-button (click)="goBack()"><mat-icon>arrow_back</mat-icon></button>
+  </div>
+
+  @if (loading()) {
+    <div class="match-detail__loading"><mat-spinner diameter="40" /></div>
+  } @else if (error()) {
+    <div class="match-detail__error">
+      <p>{{ 'match.detail.loadError' | translate }}</p>
+      <button mat-button (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (match()) {
+    <div class="match-detail__header">
+      <h2 class="match-detail__title">{{ match()!.title }}</h2>
+      @if (canEditMatch()) {
+        <button mat-icon-button (click)="openEditDialog()" [matTooltip]="'match.edit.title' | translate">
+          <mat-icon>edit</mat-icon>
+        </button>
+      }
+      <span class="match-detail__status match-detail__status--{{ match()!.status.toLowerCase() }}">
+        {{ match()!.status | matchStatus }}
+      </span>
+    </div>
+
+    <div class="match-detail__info">
+      <div class="match-detail__info-row">
+        <mat-icon>calendar_today</mat-icon>
+        <span>{{ match()!.startsAt | date:'EEEE, d. MMMM yyyy, HH:mm' }}</span>
+      </div>
+      @if (match()!.durationMinutes !== null) {
+        <div class="match-detail__info-row">
+          <mat-icon>timer</mat-icon>
+          <span>{{ match()!.durationMinutes }} min</span>
+        </div>
+      }
+      @if (match()!.location) {
+        <div class="match-detail__info-row">
+          <mat-icon>location_on</mat-icon>
+          <span>{{ match()!.location }}</span>
+        </div>
+      }
+      <div class="match-detail__info-row">
+        <mat-icon>group</mat-icon>
+        <span>{{ 'match.detail.playersPerTeam' | translate:{ count: match()!.playersPerTeam } }}</span>
+      </div>
+      @if (match()!.groupName) {
+        <div class="match-detail__info-row">
+          <mat-icon>groups</mat-icon>
+          @if (match()!.type === 'GroupVsGroup') {
+            <span>
+              {{ match()!.groupName }} vs {{ match()!.opponentGroupName }}
+              @if (match()!.opponentGroupInviteStatus === 'Pending') {
+                <span class="group-invite-status group-invite-status--pending">{{ 'match.detail.groupInvitePending' | translate }}</span>
+              } @else if (match()!.opponentGroupInviteStatus === 'Declined') {
+                <span class="group-invite-status group-invite-status--declined">{{ 'match.detail.groupInviteDeclined' | translate }}</span>
+              }
+            </span>
+          } @else {
+            <span>{{ match()!.groupName }}</span>
+          }
+        </div>
+      }
+    </div>
+
+    @if (canRespondToGroupInvite()) {
+      <div class="group-invite-banner">
+        <p>{{ 'match.detail.groupInvitePrompt' | translate:{ group: match()!.groupName ?? '' } }}</p>
+        <div class="group-invite-banner__actions">
+          <button mat-raised-button color="primary" (click)="respondToGroupInvite(true)" [disabled]="actionLoading()">
+            <mat-icon>check</mat-icon> {{ 'match.detail.accept' | translate }}
+          </button>
+          <button mat-stroked-button (click)="respondToGroupInvite(false)" [disabled]="actionLoading()">
+            <mat-icon>close</mat-icon> {{ 'match.detail.decline' | translate }}
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (match()!.homeScore !== null && match()!.awayScore !== null) {
+      <div class="match-detail__result">
+        <span class="match-detail__score">{{ match()!.homeScore }} : {{ match()!.awayScore }}</span>
+        <span class="match-detail__result-label">{{ 'match.detail.resultLabel' | translate }}</span>
+        @if (match()!.goals.length > 0) {
+          <div class="match-detail__goals">
+            <div class="match-detail__goals-col">
+              @for (g of match()!.goals; track $index) {
+                @if (g.scoringTeam === 'Home') {
+                  <div class="goal-entry-line">
+                    <mat-icon>sports_soccer</mat-icon>
+                    <span>{{ g.scorerDisplayName }}</span>
+                    @if (g.isOwnGoal) {
+                      <span class="goal-entry-line__tag">{{ 'match.detail.ownGoal' | translate }}</span>
+                    } @else if (g.assistDisplayName) {
+                      <span class="goal-entry-line__assist">({{ g.assistDisplayName }})</span>
+                    }
+                  </div>
+                }
+              }
+            </div>
+            <div class="match-detail__goals-col">
+              @for (g of match()!.goals; track $index) {
+                @if (g.scoringTeam === 'Away') {
+                  <div class="goal-entry-line">
+                    <mat-icon>sports_soccer</mat-icon>
+                    <span>{{ g.scorerDisplayName }}</span>
+                    @if (g.isOwnGoal) {
+                      <span class="goal-entry-line__tag">{{ 'match.detail.ownGoal' | translate }}</span>
+                    } @else if (g.assistDisplayName) {
+                      <span class="goal-entry-line__assist">({{ g.assistDisplayName }})</span>
+                    }
+                  </div>
+                }
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <mat-divider />
+
+    <div class="match-detail__section-title">{{ 'match.detail.sectionTeams' | translate }}</div>
+
+    @if (teamsAssigned()) {
+      <div class="teams-grid">
+        <div class="team-column team-column--home">
+          <div class="team-column__header">
+            <mat-icon>home</mat-icon> {{ 'match.detail.teamHome' | translate }}
+          </div>
+          @for (p of homeTeam(); track p.id) {
+            <div class="team-player" [routerLink]="p.isGuest ? null : ['/players', p.userId]">
+              @if (p.isCaptain) { <mat-icon class="team-player__captain">star</mat-icon> }
+              @if (p.isBench) { <mat-icon class="team-player__bench" [matTooltip]="'match.detail.bench' | translate">chair</mat-icon> }
+              <app-player-badge class="team-player__badge" size="sm"
+                [avatarUrl]="p.avatarUrl" [username]="p.username" [countryCode]="p.nationality" [name]="p.displayName" />
+              @if (p.isGuest) { <span class="guest-tag">{{ 'match.guests.tag' | translate }}</span> }
+              @if (canAssignTeams()) {
+                <button mat-icon-button class="team-player__move"
+                  (click)="$event.stopPropagation(); assignToTeam(p, 'Away')"
+                  [matTooltip]="'match.detail.moveTitleAway' | translate">
+                  <mat-icon>arrow_forward</mat-icon>
+                </button>
+                <button mat-icon-button class="team-player__remove"
+                  (click)="$event.stopPropagation(); assignToTeam(p, 'None')"
+                  [matTooltip]="'match.detail.removeFromTeam' | translate">
+                  <mat-icon>person_remove</mat-icon>
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="team-column team-column--away">
+          <div class="team-column__header">
+            <mat-icon>flight_takeoff</mat-icon> {{ 'match.detail.teamAway' | translate }}
+          </div>
+          @for (p of awayTeam(); track p.id) {
+            <div class="team-player" [routerLink]="p.isGuest ? null : ['/players', p.userId]">
+              @if (p.isCaptain) { <mat-icon class="team-player__captain">star</mat-icon> }
+              @if (p.isBench) { <mat-icon class="team-player__bench" [matTooltip]="'match.detail.bench' | translate">chair</mat-icon> }
+              <app-player-badge class="team-player__badge" size="sm"
+                [avatarUrl]="p.avatarUrl" [username]="p.username" [countryCode]="p.nationality" [name]="p.displayName" />
+              @if (p.isGuest) { <span class="guest-tag">{{ 'match.guests.tag' | translate }}</span> }
+              @if (canAssignTeams()) {
+                <button mat-icon-button class="team-player__move"
+                  (click)="$event.stopPropagation(); assignToTeam(p, 'Home')"
+                  [matTooltip]="'match.detail.moveTitleHome' | translate">
+                  <mat-icon>arrow_back</mat-icon>
+                </button>
+                <button mat-icon-button class="team-player__remove"
+                  (click)="$event.stopPropagation(); assignToTeam(p, 'None')"
+                  [matTooltip]="'match.detail.removeFromTeam' | translate">
+                  <mat-icon>person_remove</mat-icon>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (canAssignTeams() && acceptedParticipants().length >= 2) {
+      <div class="match-detail__team-actions">
+        <span class="match-detail__team-actions-label">{{ 'match.detail.teamSetupLabel' | translate }}</span>
+        <button mat-stroked-button (click)="randomize()" [disabled]="actionLoading()">
+          <mat-icon>shuffle</mat-icon> {{ 'match.detail.randomize' | translate }}
+        </button>
+        <button mat-stroked-button (click)="showCaptainSelector.set(!showCaptainSelector())" [disabled]="actionLoading()">
+          <mat-icon>star</mat-icon> {{ 'match.detail.withCaptains' | translate }}
+        </button>
+        <button mat-stroked-button (click)="balance()" [disabled]="actionLoading()">
+          <mat-icon>balance</mat-icon> {{ 'match.detail.balanced' | translate }}
+        </button>
+      </div>
+
+      @if (showCaptainSelector()) {
+        <div class="captain-selector">
+          <mat-select [placeholder]="'match.detail.captainHomePlaceholder' | translate" [value]="homeCaptainId()"
+            (selectionChange)="homeCaptainId.set($event.value)">
+            @for (p of acceptedParticipants(); track p.userId) {
+              <mat-option [value]="p.userId" [disabled]="p.userId === awayCaptainId()">
+                {{ p.displayName }}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-select [placeholder]="'match.detail.captainAwayPlaceholder' | translate" [value]="awayCaptainId()"
+            (selectionChange)="awayCaptainId.set($event.value)">
+            @for (p of acceptedParticipants(); track p.userId) {
+              <mat-option [value]="p.userId" [disabled]="p.userId === homeCaptainId()">
+                {{ p.displayName }}
+              </mat-option>
+            }
+          </mat-select>
+          <button mat-raised-button color="primary"
+            [disabled]="!homeCaptainId() || !awayCaptainId() || actionLoading()"
+            (click)="randomizeWithCaptains()">
+            {{ 'common.confirm' | translate }}
+          </button>
+        </div>
+      }
+    }
+
+    <mat-divider style="margin: 16px 0" />
+    <div class="match-detail__section-title">
+      {{ 'match.detail.sectionAccepted' | translate:{ count: acceptedParticipants().length } }}
+    </div>
+    @if (acceptedParticipants().length === 0) {
+      <p class="match-detail__no-players">{{ 'match.detail.noPlayersYet' | translate }}</p>
+    } @else {
+      <ul class="participant-list">
+        @for (p of acceptedParticipants(); track p.id) {
+          <li class="participant-item" [routerLink]="p.isGuest ? null : ['/players', p.userId]" style="cursor:pointer">
+            <div class="participant-item__info">
+              <app-player-badge size="sm"
+                [avatarUrl]="p.avatarUrl" [username]="p.username" [countryCode]="p.nationality" [name]="p.displayName" />
+              @if (p.isGuest) { <span class="guest-tag">{{ 'match.guests.tag' | translate }}</span> }
+              @if (p.isCaptain) {
+                <mat-icon style="font-size:16px;height:16px;width:16px;color:var(--color-primary)">star</mat-icon>
+              }
+              @if (p.isBench) {
+                <mat-icon style="font-size:16px;height:16px;width:16px;color:var(--cb-text-muted)" [matTooltip]="'match.detail.bench' | translate">chair</mat-icon>
+              }
+              @if (p.team && p.team !== 'None') {
+                <span class="participant-item__team-tag participant-item__team-tag--{{ p.team.toLowerCase() }}">
+                  {{ (p.team === 'Home' ? 'match.detail.teamHome' : 'match.detail.teamAway') | translate }}
+                </span>
+                @if (canAssignTeams()) {
+                  <button mat-icon-button class="participant-item__remove-btn"
+                    (click)="$event.stopPropagation(); assignToTeam(p, 'None')"
+                    [matTooltip]="'match.detail.removeFromTeam' | translate">
+                    <mat-icon>person_remove</mat-icon>
+                  </button>
+                }
+              } @else if (canAssignTeams()) {
+                <div class="participant-item__team-btns" (click)="$event.stopPropagation()">
+                  <button mat-stroked-button (click)="assignToTeam(p, 'Home')">H</button>
+                  <button mat-stroked-button (click)="assignToTeam(p, 'Away')">G</button>
+                </div>
+              }
+              @if (canAssignTeams() && !p.isOrganizer && p.userId !== match()!.secondOrganizerUserId) {
+                <button mat-icon-button class="participant-item__kick-btn"
+                  (click)="$event.stopPropagation(); kickParticipant(p)"
+                  [matTooltip]="'match.detail.kickFromMatch' | translate">
+                  <mat-icon>person_off</mat-icon>
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (canEditMatch()) {
+      <div class="match-detail__invite-action">
+        <button mat-stroked-button (click)="openInviteDialog()">
+          <mat-icon>person_add</mat-icon> {{ 'match.invite.title' | translate }}
+        </button>
+      </div>
+    }
+
+    @if (otherParticipants().length > 0) {
+      <mat-divider style="margin: 16px 0" />
+      <div class="match-detail__section-title">{{ 'match.detail.sectionOtherInvited' | translate }}</div>
+      <ul class="participant-list">
+        @for (p of match()!.participants; track p.id) {
+          @if (p.status !== 'Accepted') {
+            <li class="participant-item" [routerLink]="p.isGuest ? null : ['/players', p.userId]" style="cursor:pointer">
+              <div class="participant-item__info">
+                <app-player-badge size="sm"
+                  [avatarUrl]="p.avatarUrl" [username]="p.username" [countryCode]="p.nationality" [name]="p.displayName" />
+                @if (p.isGuest) { <span class="guest-tag">{{ 'match.guests.tag' | translate }}</span> }
+                <span class="participant-item__status participant-item__status--{{ p.status.toLowerCase() }}">
+                  {{ participantStatusKey(p.status) | translate }}
+                </span>
+              </div>
+            </li>
+          }
+        }
+      </ul>
+    }
+
+    <app-match-media
+      [matchId]="match()!.id"
+      [canAdd]="canAddMedia()"
+      [currentUserId]="currentUserId()"
+      [isOrganizer]="isOrganizer()" />
+
+    @if (canReview()) {
+      <mat-divider style="margin: 16px 0" />
+      <div class="match-detail__actions">
+        <button mat-raised-button color="primary"
+          (click)="openReviewDialog()"
+          [disabled]="allReviewed()">
+          <mat-icon>rate_review</mat-icon>
+          {{ (allReviewed() ? 'match.detail.reviewAllDone' : 'match.detail.reviewButton') | translate }}
+        </button>
+      </div>
+    }
+
+    @if (canRespond()) {
+      <div class="match-detail__actions">
+        <button mat-raised-button color="primary" (click)="accept()" [disabled]="actionLoading()">
+          <mat-icon>check</mat-icon> {{ 'match.detail.accept' | translate }}
+        </button>
+        <button mat-stroked-button (click)="decline()" [disabled]="actionLoading()">
+          <mat-icon>close</mat-icon> {{ 'match.detail.decline' | translate }}
+        </button>
+      </div>
+    }
+
+    @if (canWithdraw()) {
+      <div class="match-detail__actions">
+        <button mat-stroked-button color="warn" (click)="withdraw()" [disabled]="actionLoading()">
+          <mat-icon>exit_to_app</mat-icon> {{ 'match.detail.withdraw' | translate }}
+        </button>
+      </div>
+    }
+
+    @if (canSubmitResult()) {
+      <app-match-result-form
+        [matchId]="matchId"
+        [eligibleScorers]="eligibleScorers()"
+        [enabled]="resultFormEnabled()"
+        [timeOver]="matchTimeOver()"
+        [enoughPlayers]="enoughPlayersForResult()"
+        [endsAtFormatted]="matchEndsAtFormatted()"
+        [missingPlayers]="missingPlayers()"
+        (submitted)="load()" />
+    }
+
+    @if (canRequestPlayers()) {
+      <div class="match-detail__actions">
+        <button mat-stroked-button [matMenuTriggerFor]="wantedMenu" [disabled]="actionLoading()">
+          <mat-icon>campaign</mat-icon> {{ 'match.detail.requestPlayer' | translate }}
+        </button>
+        <mat-menu #wantedMenu="matMenu">
+          <button mat-menu-item (click)="requestPlayers(null)">{{ 'feed.wanted.anyPlayer' | translate }}</button>
+          <button mat-menu-item (click)="requestPlayers('Goalkeeper')">{{ 'feed.wanted.positions.Goalkeeper' | translate }}</button>
+          <button mat-menu-item (click)="requestPlayers('Defender')">{{ 'feed.wanted.positions.Defender' | translate }}</button>
+          <button mat-menu-item (click)="requestPlayers('Midfielder')">{{ 'feed.wanted.positions.Midfielder' | translate }}</button>
+          <button mat-menu-item (click)="requestPlayers('Forward')">{{ 'feed.wanted.positions.Forward' | translate }}</button>
+        </mat-menu>
+      </div>
+    }
+
+    @if (canCancel()) {
+      <div class="match-detail__actions match-detail__actions--danger">
+        <button mat-stroked-button color="warn" (click)="cancelMatch()" [disabled]="actionLoading()">
+          <mat-icon>cancel</mat-icon> {{ 'match.detail.cancelMatch' | translate }}
+        </button>
+      </div>
+    }
+  }
+</div>

@@ -17,6 +17,24 @@ services:
       timeout: 5s
       retries: 5
 
+  postgres-match:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: comeback_match
+      POSTGRES_USER: comeback
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-comeback_dev}
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres-match-data:/var/lib/postgresql/data
+    networks:
+      - comeback-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U comeback -d comeback_match"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   postgres-notification:
     image: postgres:16-alpine
     environment:
@@ -101,6 +119,42 @@ services:
       - comeback-network
     restart: on-failure
 
+  match-api:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: match
+        SERVICE_NAME: Match
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__DefaultConnection: "Host=postgres-match;Port=5432;Database=comeback_match;Username=comeback;Password=${POSTGRES_PASSWORD:-comeback_dev}"
+      Cloudinary__CloudName: ${CLOUDINARY_CLOUD_NAME:-}
+      Cloudinary__ApiKey: ${CLOUDINARY_API_KEY:-}
+      Cloudinary__ApiSecret: ${CLOUDINARY_API_SECRET:-}
+      JwtSettings__Secret: ${JWT_SECRET:-dev-secret-min-32-chars-comeback-auth-2026}
+      JwtSettings__Issuer: comeback-auth
+      JwtSettings__Audience: comeback-api
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: comeback
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-comeback_dev}
+      Services__RatingApi: http://rating-api:8080
+      Services__ProfileApi: http://profile-api:8080
+      Seq__ServerUrl: http://seq:5341
+    ports:
+      - "5510:8080"
+    depends_on:
+      postgres-match:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      profile-api:
+        condition: service_started
+    networks:
+      - comeback-network
+    restart: on-failure
+
   notification-api:
     build:
       context: ../..
@@ -142,6 +196,7 @@ services:
 
 volumes:
   postgres-auth-data:
+  postgres-match-data:
   postgres-notification-data:
   rabbitmq-data:
   seq-data:
