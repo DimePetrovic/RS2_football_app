@@ -1,0 +1,50 @@
+<div class="groups-page">
+  <header class="groups-page__header">
+    <h1 class="groups-page__title">{{ 'groups.title' | translate }}</h1>
+    <button mat-icon-button (click)="openCreate()" [matTooltip]="'groups.create' | translate">
+      <mat-icon>group_add</mat-icon>
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div class="groups-page__center">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else if (error()) {
+    <div class="groups-page__center groups-page__error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ 'errors.serverError' | translate }}</p>
+      <button mat-button (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (groups().length === 0) {
+    <div class="groups-page__empty">
+      <mat-icon class="groups-page__empty-icon">groups</mat-icon>
+      <p class="groups-page__empty-text">{{ 'groups.empty' | translate }}</p>
+      <button mat-flat-button class="cb-btn-primary" (click)="openCreate()">
+        {{ 'groups.create' | translate }}
+      </button>
+    </div>
+  } @else {
+    <div class="groups-list">
+      @for (group of groups(); track group.id) {
+        <button class="group-card" (click)="goToGroup(group.id)">
+          <div class="group-card__avatar">
+            @if (group.avatarUrl) {
+              <img [src]="group.avatarUrl" [alt]="group.name" />
+            } @else {
+              <mat-icon>groups</mat-icon>
+            }
+          </div>
+          <div class="group-card__info">
+            <span class="group-card__name">{{ group.name }}</span>
+            <span class="group-card__meta">{{ group.memberCount }} {{ 'groups.members' | translate }}</span>
+          </div>
+          <span class="group-card__role" [class.group-card__role--captain]="group.myRole === 'Captain'">
+            {{ (group.myRole === 'Captain' ? 'groups.role.captain' : 'groups.role.member') | translate }}
+          </span>
+          <mat-icon class="group-card__chevron">chevron_right</mat-icon>
+        </button>
+      }
+    </div>
+  }
+</div>

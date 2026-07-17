@@ -1,0 +1,161 @@
+<div class="profile-page">
+  <header class="profile-header-nav">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div class="state-center">
+      <mat-spinner diameter="48" />
+    </div>
+  } @else if (error()) {
+    <div class="state-center">
+      <mat-icon class="state-icon state-icon--error">error_outline</mat-icon>
+      <p>{{ 'profile.notFound' | translate }}</p>
+    </div>
+  } @else if (profile()) {
+
+    <!-- ── Player card ─────────────────────────────── -->
+    <div class="player-card">
+      <div class="player-card__top">
+        <div class="avatar-wrap">
+          @if (profile()!.avatarUrl) {
+            <img class="avatar" [src]="profile()!.avatarUrl!" [alt]="profile()!.displayName ?? ''" />
+          } @else {
+            <div class="avatar avatar--placeholder">
+              <mat-icon>person</mat-icon>
+            </div>
+          }
+        </div>
+
+        <div class="player-card__identity">
+          <h1 class="profile-name">
+            {{ profile()!.displayName || (profile()!.firstName + ' ' + profile()!.lastName) }}
+            @if (nationalityFlag()) {
+              <span class="profile-name__flag {{ nationalityFlag() }}" [matTooltip]="'countries.' + profile()!.nationality! | translate"></span>
+            }
+          </h1>
+          @if (profile()!.username) {
+            <span class="profile-username">{{ '@' + profile()!.username }}</span>
+          }
+          @if (followCounts(); as fc) {
+            <div class="follow-counts">
+              <button type="button" class="follow-counts__item" (click)="openFollowList('followers')">
+                <strong class="cb-mono">{{ fc.followers }}</strong> {{ 'profile.followersTitle' | translate }}
+              </button>
+              <span class="follow-counts__sep">·</span>
+              <button type="button" class="follow-counts__item" (click)="openFollowList('following')">
+                <strong class="cb-mono">{{ fc.following }}</strong> {{ 'profile.followingTitle' | translate }}
+              </button>
+            </div>
+          }
+          <div class="profile-badges">
+            @if (profile()!.preferredPosition) {
+              <span class="profile-badge">
+                {{ 'profile.positions.' + profile()!.preferredPosition | translate }}
+              </span>
+            }
+            @if (profile()!.canPlayGoalkeeper && profile()!.preferredPosition !== 'Goalkeeper') {
+              <span class="profile-badge">
+                {{ 'profile.canPlayGoalkeeper' | translate }}
+              </span>
+            }
+            @if (profile()!.skillLevel) {
+              <span class="profile-badge profile-badge--skill">
+                {{ 'profile.skillLevels.' + profile()!.skillLevel! | translate }}
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (profile()!.bio) {
+        <p class="player-card__bio">{{ profile()!.bio }}</p>
+      }
+
+      <!-- Level + XP -->
+      @if (xp()) {
+        <div class="player-card__xp">
+          <div class="xp-level">
+            <span class="xp-level__number">{{ xp()!.level }}</span>
+            <span class="xp-level__label">nivo</span>
+          </div>
+          <div class="xp-bar-wrap">
+            <div class="xp-bar">
+              <div class="xp-bar__fill" [style.width.%]="xpProgressPercent()"></div>
+            </div>
+            <span class="xp-bar__text">{{ xp()!.totalXp }} / {{ xp()!.totalXp + xp()!.xpToNextLevel }} XP</span>
+          </div>
+        </div>
+      }
+
+      <!-- Average ratings -->
+      @if (avgOverall() !== null) {
+        <div class="player-card__ratings">
+          <div class="rating-pill rating-pill--main">
+            <span class="rating-pill__label">{{ 'profile.rating.overall' | translate }}</span>
+            <span class="rating-pill__value">{{ avgOverall() }}</span>
+          </div>
+          @if (avgGoalkeeping() !== null) {
+            <div class="rating-pill">
+              <span class="rating-pill__label">{{ 'profile.rating.goalkeeping' | translate }}</span>
+              <span class="rating-pill__value">{{ avgGoalkeeping() }}</span>
+            </div>
+          }
+          @if (avgDefense() !== null) {
+            <div class="rating-pill">
+              <span class="rating-pill__label">{{ 'profile.rating.defense' | translate }}</span>
+              <span class="rating-pill__value">{{ avgDefense() }}</span>
+            </div>
+          }
+          @if (avgAttack() !== null) {
+            <div class="rating-pill">
+              <span class="rating-pill__label">{{ 'profile.rating.attack' | translate }}</span>
+              <span class="rating-pill__value">{{ avgAttack() }}</span>
+            </div>
+          }
+          @if (avgEffort() !== null) {
+            <div class="rating-pill">
+              <span class="rating-pill__label">{{ 'profile.rating.effort' | translate }}</span>
+              <span class="rating-pill__value">{{ avgEffort() }}</span>
+            </div>
+          }
+          <span class="rating-count">{{ reviews().length }} ocen{{ reviews().length === 1 ? 'a' : 'a' }}</span>
+        </div>
+      } @else {
+        <p class="player-card__no-ratings">{{ 'profile.noRatings' | translate }}</p>
+      }
+    </div>
+
+    @if (isOwnProfile()) {
+      <div class="profile-actions">
+        <button mat-raised-button class="cb-btn-primary edit-btn" (click)="navigateToEdit()">
+          <mat-icon>edit</mat-icon>
+          {{ 'profile.editButton' | translate }}
+        </button>
+        <button mat-stroked-button routerLink="/profile/stats">
+          <mat-icon>query_stats</mat-icon>
+          {{ 'stats.advancedButton' | translate }}
+        </button>
+      </div>
+    } @else {
+      <div class="profile-actions">
+        <button mat-stroked-button [color]="isFollowing() ? 'primary' : undefined"
+          [disabled]="followLoading()" (click)="toggleFollow()">
+          <mat-icon>{{ isFollowing() ? 'how_to_reg' : 'person_add' }}</mat-icon>
+          {{ (isFollowing() ? 'profile.unfollow' : 'profile.follow') | translate }}
+        </button>
+        <button mat-raised-button color="primary" class="edit-btn" (click)="startChat()">
+          <mat-icon>chat</mat-icon>
+          {{ 'chat.startChat' | translate }}
+        </button>
+      </div>
+    }
+
+    <app-reviews-section [reviews]="reviews()" />
+
+    <app-match-history-section [matches]="matchHistory()" />
+
+  }
+</div>

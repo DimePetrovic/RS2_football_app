@@ -1,0 +1,30 @@
+<div class="avatar-upload">
+  <div class="avatar-upload__preview">
+    @if (uploading()) {
+      <mat-spinner diameter="32" />
+    } @else if (url) {
+      <img [src]="url" [alt]="'profile.avatar' | translate" />
+    } @else {
+      <mat-icon>{{ icon }}</mat-icon>
+    }
+  </div>
+
+  <div class="avatar-upload__actions">
+    <button mat-stroked-button type="button" (click)="pickFile()" [disabled]="uploading()">
+      <mat-icon>photo_camera</mat-icon>
+      {{ (url ? 'profile.avatarChange' : 'profile.avatarUpload') | translate }}
+    </button>
+    @if (url && !uploading()) {
+      <button mat-icon-button type="button" (click)="removeAvatar()"
+        [matTooltip]="'profile.avatarRemove' | translate">
+        <mat-icon>delete</mat-icon>
+      </button>
+    }
+  </div>
+
+  @if (errorKey()) {
+    <p class="avatar-upload__error">{{ errorKey()! | translate }}</p>
+  }
+
+  <input #fileInput type="file" hidden [accept]="acceptTypes" (change)="onFileSelected($event)" />
+</div>

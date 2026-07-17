@@ -1,0 +1,40 @@
+.edit-page {
+  padding: 0 16px 32px;
+  max-width: 600px;
+  margin: 0 auto;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0 16px;
+  }
+
+  &__title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+
+  &__loading {
+    display: flex;
+    justify-content: center;
+    padding: 48px;
+  }
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &__actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+
+    button:last-child { flex: 1; }
+  }
+}

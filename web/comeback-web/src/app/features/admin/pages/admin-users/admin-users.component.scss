@@ -1,0 +1,91 @@
+.admin-page {
+  padding: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+
+  &__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  &__title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+
+  &__count {
+    font-size: 13px;
+    color: var(--cb-text-muted);
+  }
+}
+
+.admin-search {
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  background: var(--cb-surface);
+  color: var(--cb-text);
+  border: 1px solid var(--cb-border);
+  border-radius: var(--cb-radius-sm);
+  font-size: 14px;
+  color-scheme: dark;
+
+  &::placeholder { color: var(--cb-text-muted); }
+  &:focus { outline: none; border-color: var(--cb-primary); }
+}
+
+.state-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 16px;
+  color: var(--cb-text-muted);
+}
+
+.state-icon {
+  font-size: 48px;
+  &--error { color: var(--cb-error); }
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--cb-border);
+  border-radius: var(--cb-radius);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  thead {
+    background: var(--cb-surface-2);
+
+    th {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--cb-text-muted);
+    }
+  }
+
+  tbody tr {
+    border-top: 1px solid var(--cb-border);
+
+    &:hover { background: var(--cb-surface-2); }
+  }
+}

@@ -17,6 +17,24 @@ services:
       timeout: 5s
       retries: 5
 
+  postgres-profile:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: comeback_profile
+      POSTGRES_USER: comeback
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-comeback_dev}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-profile-data:/var/lib/postgresql/data
+    networks:
+      - comeback-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U comeback -d comeback_profile"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   postgres-match:
     image: postgres:16-alpine
     environment:
@@ -88,6 +106,44 @@ services:
 
   # ── .NET servisi ─────────────────────────────────────────────
 
+  gateway:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.gateway
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      JwtSettings__Secret: ${JWT_SECRET:-dev-secret-min-32-chars-comeback-auth-2026}
+      JwtSettings__Issuer: comeback-auth
+      JwtSettings__Audience: comeback-api
+      Services__AuthApi: http://auth-api:8080
+      Services__ProfileApi: http://profile-api:8080
+      Services__RatingApi: http://rating-api:8080
+      Services__MatchApi: http://match-api:8080
+      Services__NotificationApi: http://notification-api:8080
+      Services__SocialApi: http://social-api:8080
+      Seq__ServerUrl: http://seq:5341
+      ReverseProxy__Clusters__auth-cluster__Destinations__auth-api__Address: http://auth-api:8080
+      ReverseProxy__Clusters__profile-cluster__Destinations__profile-api__Address: http://profile-api:8080
+      ReverseProxy__Clusters__rating-cluster__Destinations__rating-api__Address: http://rating-api:8080
+      ReverseProxy__Clusters__match-cluster__Destinations__match-api__Address: http://match-api:8080
+      ReverseProxy__Clusters__notification-cluster__Destinations__notification-api__Address: http://notification-api:8080
+      ReverseProxy__Clusters__chat-cluster__Destinations__chat-api__Address: http://chat-api:8080
+      ReverseProxy__Clusters__social-cluster__Destinations__social-api__Address: http://social-api:8080
+    ports:
+      - "5000:8080"
+    depends_on:
+      - auth-api
+      - profile-api
+      - rating-api
+      - match-api
+      - notification-api
+      - chat-api
+      - social-api
+    networks:
+      - comeback-network
+    restart: on-failure
+
   auth-api:
     build:
       context: ../..
@@ -112,6 +168,38 @@ services:
       - "5104:8080"
     depends_on:
       postgres-auth:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - comeback-network
+    restart: on-failure
+
+  profile-api:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: profile
+        SERVICE_NAME: Profile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__DefaultConnection: "Host=postgres-profile;Port=5432;Database=comeback_profile;Username=comeback;Password=${POSTGRES_PASSWORD:-comeback_dev}"
+      Cloudinary__CloudName: ${CLOUDINARY_CLOUD_NAME:-}
+      Cloudinary__ApiKey: ${CLOUDINARY_API_KEY:-}
+      Cloudinary__ApiSecret: ${CLOUDINARY_API_SECRET:-}
+      JwtSettings__Secret: ${JWT_SECRET:-dev-secret-min-32-chars-comeback-auth-2026}
+      JwtSettings__Issuer: comeback-auth
+      JwtSettings__Audience: comeback-api
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: comeback
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-comeback_dev}
+      Seq__ServerUrl: http://seq:5341
+    ports:
+      - "5210:8080"
+    depends_on:
+      postgres-profile:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -196,6 +284,7 @@ services:
 
 volumes:
   postgres-auth-data:
+  postgres-profile-data:
   postgres-match-data:
   postgres-notification-data:
   rabbitmq-data:

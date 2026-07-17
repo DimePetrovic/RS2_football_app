@@ -1,0 +1,284 @@
+.profile-page {
+  padding: 0 16px 32px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.profile-header-nav {
+  padding: 8px 0;
+}
+
+.state-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 16px;
+  color: var(--cb-text-muted);
+}
+
+.state-icon {
+  font-size: 48px;
+  &--error { color: var(--cb-error); }
+}
+
+// ── Player card ───────────────────────────────────────────────────
+
+.player-card {
+  background: var(--cb-surface-2);
+  border: 1px solid var(--cb-border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__identity {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__bio {
+    color: var(--cb-text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  &__xp {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--cb-surface);
+    border-radius: 10px;
+  }
+
+  &__ratings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  &__no-ratings {
+    font-size: 13px;
+    color: var(--cb-text-muted);
+    margin: 0;
+  }
+}
+
+.avatar-wrap { flex-shrink: 0; }
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--cb-border);
+
+  &--placeholder {
+    background: var(--cb-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
+      color: var(--cb-text-muted);
+    }
+  }
+}
+
+.profile-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--cb-text);
+  margin: 0;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-username {
+  font-size: 12px;
+  color: var(--cb-text-muted);
+}
+
+.profile-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.profile-badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--cb-surface);
+  border: 1px solid var(--cb-border);
+  border-radius: 4px;
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cb-primary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  &--skill { color: var(--cb-text-muted); }
+}
+
+// XP
+
+.xp-level {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-shrink: 0;
+
+  &__number {
+    font-family: 'Oswald', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--cb-primary);
+    line-height: 1;
+  }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cb-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+
+.xp-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.xp-bar {
+  height: 6px;
+  background: var(--cb-border);
+  border-radius: 3px;
+  overflow: hidden;
+
+  &__fill {
+    height: 100%;
+    background: var(--cb-primary);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+}
+
+.xp-bar__text {
+  font-size: 11px;
+  color: var(--cb-text-muted);
+  text-align: right;
+}
+
+// Rating pills
+
+.rating-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--cb-surface);
+  border: 1px solid var(--cb-border);
+  border-radius: 10px;
+  padding: 6px 12px;
+  min-width: 56px;
+
+  &--main {
+    border-color: var(--cb-primary);
+    background: color-mix(in srgb, var(--cb-primary) 10%, var(--cb-surface));
+
+    .rating-pill__value { color: var(--cb-primary); font-size: 1.3rem; }
+  }
+
+  &__label {
+    font-size: 10px;
+    color: var(--cb-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  &__value {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--cb-text);
+    line-height: 1.2;
+  }
+}
+
+.rating-count {
+  font-size: 11px;
+  color: var(--cb-text-muted);
+  margin-left: auto;
+  align-self: flex-end;
+}
+
+// ── Sections ─────────────────────────────────────────────────────
+
+.edit-btn {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  .edit-btn { margin-bottom: 0; flex: 1; }
+  button:first-child { flex: 1; }
+}
+
+.profile-section {
+  margin-bottom: 20px;
+}
+
+
+
+// ── Follower / following counts under the username ──
+.follow-counts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+
+  &__item {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 13px;
+    color: var(--cb-text-muted);
+    cursor: pointer;
+
+    strong { color: var(--cb-text); margin-right: 3px; }
+    &:hover { color: var(--cb-primary); }
+  }
+
+  &__sep { color: var(--cb-text-muted); }
+}
