@@ -1,0 +1,106 @@
+<div class="group-detail">
+  <header class="group-detail__header">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    @if (group()) {
+      <h1 class="group-detail__title">{{ group()!.name }}</h1>
+    }
+    @if (group()?.myRole === 'Captain') {
+      <button mat-icon-button (click)="openEdit()" [matTooltip]="'groups.editDialog.title' | translate">
+        <mat-icon>edit</mat-icon>
+      </button>
+    }
+    @if (group()) {
+      <button mat-icon-button [routerLink]="['/chats']" [queryParams]="{ groupId: group()!.id }" [matTooltip]="'groups.chatButton' | translate">
+        <mat-icon>chat</mat-icon>
+      </button>
+    }
+    @if (group()) {
+      <button mat-icon-button [routerLink]="['/groups', group()!.id, 'stats']" [matTooltip]="'groups.stats.title' | translate">
+        <mat-icon>query_stats</mat-icon>
+      </button>
+    }
+  </header>
+
+  @if (loading()) {
+    <div class="group-detail__center">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else if (error()) {
+    <div class="group-detail__center">
+      <mat-icon>error_outline</mat-icon>
+      <button mat-button (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (group()) {
+    <div class="group-detail__body">
+
+      <div class="group-detail__avatar">
+        @if (group()!.avatarUrl) {
+          <img [src]="group()!.avatarUrl" [alt]="group()!.name" />
+        } @else {
+          <mat-icon>groups</mat-icon>
+        }
+      </div>
+
+      <section class="group-detail__section">
+        <div class="group-detail__section-header">
+          <h2 class="group-detail__section-title">{{ 'groups.detail.members' | translate: { count: group()!.members.length } }}</h2>
+          @if (group()!.myRole === 'Captain') {
+            <button mat-icon-button (click)="openAddMember()" [matTooltip]="'groups.addPlayer.title' | translate">
+              <mat-icon>person_add</mat-icon>
+            </button>
+          }
+        </div>
+        <div class="member-list">
+          @for (member of group()!.members; track member.profileId) {
+            <div class="member-item" [routerLink]="['/players', member.userId]">
+              <app-player-badge class="member-item__badge-comp"
+                [avatarUrl]="member.avatarUrl" [username]="member.username"
+                [name]="member.firstName + ' ' + member.lastName" />
+              @if (member.role === 'Captain') {
+                <span class="member-item__badge">Kapiten</span>
+              }
+              @if (group()!.myRole === 'Captain' && member.role !== 'Captain') {
+                <button mat-icon-button class="member-item__remove"
+                  (click)="confirmRemoveMember(member)"
+                  [matTooltip]="'groups.removeMember.title' | translate">
+                  <mat-icon>person_remove</mat-icon>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </section>
+
+      @if (matchHistory().length > 0) {
+        <section class="group-detail__section">
+          <div class="group-detail__section-header">
+            <h2 class="group-detail__section-title">{{ 'groups.detail.history' | translate: { count: matchHistory().length } }}</h2>
+          </div>
+          <ul class="match-history-list">
+            @for (m of matchHistory(); track m.id) {
+              <li class="match-history-item" [routerLink]="['/matches', m.id]">
+                <div class="match-history-item__row">
+                  <span class="match-history-item__title">{{ m.title }}</span>
+                  <span class="match-history-item__date">{{ m.startsAt | date:'d.M.yyyy' }}</span>
+                </div>
+                <span class="match-history-item__status match-history-item__status--{{ m.status.toLowerCase() }}">
+                  {{ m.status }}
+                </span>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      <div class="group-detail__actions">
+        <button mat-stroked-button color="warn" (click)="confirmLeave()">
+          <mat-icon>exit_to_app</mat-icon>
+          {{ 'groups.leave.title' | translate }}
+        </button>
+      </div>
+
+    </div>
+  }
+</div>

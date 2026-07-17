@@ -1,0 +1,76 @@
+<h2 mat-dialog-title>{{ 'groups.create' | translate }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'groups.form.name' | translate }}</mat-label>
+      <input matInput formControlName="name" maxlength="100" />
+    </mat-form-field>
+
+    <app-avatar-upload
+      icon="groups"
+      [url]="form.controls.avatarUrl.value"
+      (urlChange)="onAvatarChange($event)" />
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'groups.form.searchPlaceholder' | translate }}</mat-label>
+      <input matInput formControlName="memberSearch"
+             [matAutocomplete]="auto"
+             autocomplete="off" />
+      <mat-icon matSuffix>search</mat-icon>
+      <mat-autocomplete #auto [displayWith]="displayFn" (optionSelected)="selectMember($event)">
+        @for (player of filteredResults(); track player.userId) {
+          <mat-option [value]="player">
+            <div class="player-option">
+              <div class="player-option__avatar">
+                @if (player.avatarUrl) {
+                  <img [src]="player.avatarUrl" [alt]="player.username" />
+                } @else {
+                  <span>{{ player.firstName[0] }}{{ player.lastName[0] }}</span>
+                }
+              </div>
+              <div class="player-option__info">
+                <span class="player-option__username">{{ player.username }}</span>
+                <span class="player-option__name">{{ player.firstName }} {{ player.lastName }}</span>
+              </div>
+            </div>
+          </mat-option>
+        }
+        @if (searchResults().length === 0 && (form.get('memberSearch')?.value?.length ?? 0) >= 2) {
+          <mat-option disabled>{{ 'common.noResults' | translate }}</mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+
+    @if (selectedMembers().length > 0) {
+      <div class="selected-members">
+        @for (member of selectedMembers(); track member.userId) {
+          <div class="member-chip">
+            <div class="member-chip__avatar">
+              @if (member.avatarUrl) {
+                <img [src]="member.avatarUrl" [alt]="member.username" />
+              } @else {
+                <span>{{ member.firstName[0] }}{{ member.lastName[0] }}</span>
+              }
+            </div>
+            <span class="member-chip__name">{{ member.username }}</span>
+            <button type="button" class="member-chip__remove" (click)="removeMember(member.userId)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    @if (errorMsg()) {
+      <p class="error-msg">{{ errorMsg() }}</p>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="undefined">{{ 'common.cancel' | translate }}</button>
+  <button mat-flat-button color="primary" (click)="submit()" [disabled]="saving()">
+    {{ 'groups.create' | translate }}
+  </button>
+</mat-dialog-actions>

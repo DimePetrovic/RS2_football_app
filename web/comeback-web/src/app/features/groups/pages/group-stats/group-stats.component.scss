@@ -1,0 +1,67 @@
+@use '../../../../shared/styles/stats-cards';
+.group-stats {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px;
+
+  &__back { margin-bottom: 4px; }
+
+  &__title { margin: 0 0 4px; }
+
+  &__hint {
+    color: var(--cb-text-muted);
+    font-size: 13px;
+    margin: 0 0 16px;
+  }
+
+  &__loading {
+    display: flex;
+    justify-content: center;
+    padding: 32px 0;
+  }
+
+  &__error { color: var(--cb-error); }
+
+  &__columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  &__section {
+    background: var(--cb-surface);
+    border: 1px solid var(--cb-border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+
+    h3 { margin: 0 0 8px; font-size: 15px; }
+  }
+
+  &__columns &__section { margin-top: 0; }
+
+  &__empty {
+    color: var(--cb-text-muted);
+    font-size: 13px;
+    margin: 4px 0;
+  }
+}
+
+
+
+
+.opponents-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th, td {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--cb-border);
+    color: var(--cb-text-secondary);
+  }
+
+  th { color: var(--cb-text-muted); font-weight: 500; }
+}

@@ -1,0 +1,93 @@
+<div class="edit-page">
+  <header class="edit-page__header">
+    <button mat-icon-button (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h2 class="edit-page__title">{{ 'profile.editTitle' | translate }}</h2>
+  </header>
+
+  @if (loading()) {
+    <div class="edit-page__loading">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else {
+    <app-stepper
+      [steps]="steps"
+      [current]="currentStep()"
+      (stepSelected)="goToStep($event)"
+    />
+
+    <form [formGroup]="form" (ngSubmit)="save()" class="edit-form">
+      @if (currentStep() === 0) {
+        <app-avatar-upload
+          [url]="form.value.avatarUrl || null"
+          (urlChange)="form.patchValue({ avatarUrl: $event ?? '' })"
+        />
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'profile.displayName' | translate }}</mat-label>
+          <input matInput formControlName="displayName" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'profile.bio' | translate }}</mat-label>
+          <textarea matInput formControlName="bio" rows="3"></textarea>
+        </mat-form-field>
+      }
+
+      @if (currentStep() === 1) {
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'profile.playerType' | translate }}</mat-label>
+          <mat-select formControlName="position">
+            @for (pos of positions; track pos) {
+              <mat-option [value]="pos">
+                {{ 'profile.positions.' + pos | translate }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'profile.skillLevel' | translate }}</mat-label>
+          <mat-select formControlName="skillLevel">
+            <mat-option value="">{{ 'profile.notSet' | translate }}</mat-option>
+            @for (lvl of skillLevels; track lvl) {
+              <mat-option [value]="lvl">
+                {{ 'profile.skillLevels.' + lvl | translate }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'profile.nationality' | translate }}</mat-label>
+          <mat-select formControlName="nationality">
+            <mat-option [value]="null">{{ 'profile.nationalityNone' | translate }}</mat-option>
+            @for (c of countryOptions(); track c.code) {
+              <mat-option [value]="c.code"><span class="country-flag {{ c.flag }}"></span> {{ c.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      }
+
+      <div class="cb-wizard-nav">
+        @if (currentStep() === 0) {
+          <button mat-button type="button" class="cb-btn-secondary cb-wizard-nav__back" (click)="cancel()">
+            {{ 'profile.cancelButton' | translate }}
+          </button>
+          <button type="button" mat-raised-button class="cb-btn-primary" (click)="next()">
+            {{ 'common.next' | translate }} <mat-icon>arrow_forward</mat-icon>
+          </button>
+        } @else {
+          <button type="button" mat-button class="cb-btn-secondary cb-wizard-nav__back" (click)="prev()">
+            <mat-icon>arrow_back</mat-icon> {{ 'common.back' | translate }}
+          </button>
+          <button mat-raised-button type="submit" class="cb-btn-primary" [disabled]="saving()">
+            @if (saving()) { <mat-spinner diameter="18" /> }
+            @else { {{ 'profile.saveButton' | translate }} }
+          </button>
+        }
+      </div>
+    </form>
+  }
+</div>

@@ -1,0 +1,108 @@
+<div class="group-stats">
+  <div class="group-stats__back">
+    <button mat-icon-button (click)="goBack()"><mat-icon>arrow_back</mat-icon></button>
+  </div>
+  <h2 class="group-stats__title">{{ 'groups.stats.title' | translate }} @if (groupName()) {— {{ groupName() }}}</h2>
+  <p class="group-stats__hint">{{ 'groups.stats.hint' | translate }}</p>
+
+  @if (loading()) {
+    <div class="group-stats__loading"><mat-spinner diameter="40" /></div>
+  } @else if (error()) {
+    <p class="group-stats__error">{{ 'groups.stats.loadError' | translate }}</p>
+  }
+
+  @if (stats(); as s) {
+
+    <div class="stat-tiles">
+      <div class="stat-tile">
+        <span class="stat-tile__value cb-mono">{{ s.playedCount }}</span>
+        <span class="stat-tile__label">{{ 'stats.played' | translate }}</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-tile__value cb-mono">{{ winRate() }}%</span>
+        <span class="stat-tile__label">{{ 'stats.wins' | translate }}</span>
+        <span class="stat-tile__sub">{{ 'stats.ofCount' | translate: { value: s.wins, total: s.playedCount } }}</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-tile__value cb-mono">{{ drawRate() }}%</span>
+        <span class="stat-tile__label">{{ 'stats.draws' | translate }}</span>
+        <span class="stat-tile__sub">{{ 'stats.ofCount' | translate: { value: s.draws, total: s.playedCount } }}</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-tile__value cb-mono">{{ lossRate() }}%</span>
+        <span class="stat-tile__label">{{ 'stats.losses' | translate }}</span>
+        <span class="stat-tile__sub">{{ 'stats.ofCount' | translate: { value: s.losses, total: s.playedCount } }}</span>
+      </div>
+    </div>
+
+    <div class="group-stats__columns">
+      <div class="group-stats__section">
+        <h3>{{ 'groups.stats.mostPlayedAgainst' | translate }}</h3>
+        @if (mostPlayed().length === 0) {
+          <p class="group-stats__empty">{{ 'groups.stats.noMatchesYet' | translate }}</p>
+        } @else {
+          <ol class="top-list">
+            @for (o of mostPlayed(); track o.groupId) {
+              <li>
+                <span class="top-list__name">{{ o.groupName }}</span>
+                <span class="top-list__count cb-mono">{{ o.played }}×</span>
+              </li>
+            }
+          </ol>
+        }
+      </div>
+      <div class="group-stats__section">
+        <h3>{{ 'groups.stats.mostBeaten' | translate }}</h3>
+        @if (mostBeaten().length === 0) {
+          <p class="group-stats__empty">{{ 'groups.stats.noWinsYet' | translate }}</p>
+        } @else {
+          <ol class="top-list">
+            @for (o of mostBeaten(); track o.groupId) {
+              <li>
+                <span class="top-list__name">{{ o.groupName }}</span>
+                <span class="top-list__count cb-mono">{{ o.wins }}×</span>
+              </li>
+            }
+          </ol>
+        }
+      </div>
+      <div class="group-stats__section">
+        <h3>{{ 'groups.stats.mostLostTo' | translate }}</h3>
+        @if (mostLostTo().length === 0) {
+          <p class="group-stats__empty">{{ 'groups.stats.noLossesYet' | translate }}</p>
+        } @else {
+          <ol class="top-list">
+            @for (o of mostLostTo(); track o.groupId) {
+              <li>
+                <span class="top-list__name">{{ o.groupName }}</span>
+                <span class="top-list__count cb-mono">{{ o.losses }}×</span>
+              </li>
+            }
+          </ol>
+        }
+      </div>
+    </div>
+
+    @if (s.opponents.length > 0) {
+      <div class="group-stats__section">
+        <h3>{{ 'groups.stats.allOpponents' | translate }}</h3>
+        <table class="opponents-table">
+          <thead>
+            <tr><th>{{ 'stats.group' | translate }}</th><th>{{ 'stats.played' | translate }}</th><th>{{ 'stats.abbrWins' | translate }}</th><th>{{ 'stats.abbrDraws' | translate }}</th><th>{{ 'stats.abbrLosses' | translate }}</th></tr>
+          </thead>
+          <tbody>
+            @for (o of s.opponents; track o.groupId) {
+              <tr>
+                <td>{{ o.groupName }}</td>
+                <td class="cb-mono">{{ o.played }}</td>
+                <td class="cb-mono">{{ o.wins }}</td>
+                <td class="cb-mono">{{ o.draws }}</td>
+                <td class="cb-mono">{{ o.losses }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>

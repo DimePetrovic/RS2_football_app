@@ -1,0 +1,52 @@
+<div class="admin-page">
+  <header class="admin-page__header">
+    <h1 class="admin-page__title">{{ 'admin.users.title' | translate }}</h1>
+    <span class="admin-page__count">{{ filteredUsers().length }} / {{ users().length }}</span>
+  </header>
+
+  <input
+    class="admin-search"
+    type="text"
+    [placeholder]="'admin.users.searchPlaceholder' | translate"
+    [value]="search()"
+    (input)="onSearchChange($any($event.target).value)"
+  />
+
+  @if (loading()) {
+    <div class="state-center">
+      <mat-spinner diameter="48" />
+    </div>
+  } @else if (error()) {
+    <div class="state-center">
+      <mat-icon class="state-icon state-icon--error">error_outline</mat-icon>
+      <p>{{ 'admin.users.loadError' | translate }}</p>
+    </div>
+  } @else if (filteredUsers().length === 0) {
+    <div class="state-center">
+      <p>{{ 'admin.users.noResults' | translate }}</p>
+    </div>
+  } @else {
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>{{ 'admin.users.colFirstName' | translate }}</th>
+            <th>{{ 'admin.users.colLastName' | translate }}</th>
+            <th>{{ 'admin.users.colUsername' | translate }}</th>
+            <th>{{ 'admin.users.colEmail' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of filteredUsers(); track u.userId) {
+            <tr>
+              <td>{{ u.firstName }}</td>
+              <td>{{ u.lastName }}</td>
+              <td>{{ u.username }}</td>
+              <td>{{ u.email }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

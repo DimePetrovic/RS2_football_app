@@ -80,6 +80,128 @@
       "stepFootball": "Fudbal"
     }
   },
+  "profile": {
+    "title": "Moj profil",
+    "editTitle": "Uredi profil",
+    "displayName": "Ime za prikaz",
+    "bio": "O meni",
+    "playerType": "Tip igrača",
+    "skillLevel": "Nivo veštine",
+    "avatarUrl": "URL avatara",
+    "noProfile": "Profil nije pronađen",
+    "editButton": "Uredi profil",
+    "follow": "Zapratite",
+    "unfollow": "Otpratite",
+    "saveButton": "Sačuvaj izmene",
+    "cancelButton": "Otkaži",
+    "notSet": "Nije podešeno",
+    "canPlayGoalkeeper": "Može na gol",
+    "positions": {
+      "Goalkeeper": "Golman",
+      "Defender": "Odbrana",
+      "Midfielder": "Sredina",
+      "Forward": "Napad"
+    },
+    "skillLevels": {
+      "Beginner": "Početnik",
+      "Intermediate": "Srednji",
+      "Advanced": "Napredniji",
+      "Professional": "Profesionalac"
+    },
+    "stats": {
+      "experience": "Iskustvo",
+      "reputation": "Reputacija",
+      "level": "Nivo",
+      "careerXp": "Karijerno iskustvo",
+      "matchXp": "Utakmičko iskustvo",
+      "youthSeasons": "Sezone (mlađe kat.)",
+      "seniorSeasons": "Sezone (senior)",
+      "noData": "Podaci nisu dostupni",
+      "eloNote": "ELO rejting će biti dostupan nakon odigranih utakmica"
+    },
+    "avatar": "Profilna slika",
+    "avatarUpload": "Dodaj sliku",
+    "avatarChange": "Promeni sliku",
+    "avatarRemove": "Ukloni sliku",
+    "noRatings": "Još nema ocena.",
+    "notFound": "Profil nije pronađen.",
+    "reviewsTitle": "Ocene",
+    "matchesTitle": "Utakmice",
+    "rating": {
+      "overall": "Ukupna",
+      "goalkeeping": "Branjenje",
+      "defense": "Odbrana",
+      "attack": "Napad",
+      "effort": "Trud"
+    },
+    "teamHome": "Dom",
+    "teamAway": "Gosti",
+    "ratingShort": {
+      "goalkeeping": "Br",
+      "defense": "Od",
+      "attack": "Na",
+      "effort": "Tr"
+    },
+    "followersTitle": "Pratioci",
+    "followingTitle": "Prati",
+    "noFollowers": "Još nema pratilaca.",
+    "noFollowing": "Još ne prati nikoga.",
+    "nationality": "Nacionalnost",
+    "nationalityNone": "Bez izbora"
+  },
+  "groups": {
+    "title": "Moje grupe",
+    "create": "Kreiraj grupu",
+    "empty": "Nisi član nijedne grupe.",
+    "members": "članova",
+    "role": {
+      "captain": "Kapiten",
+      "member": "Član"
+    },
+    "form": {
+      "name": "Naziv grupe",
+      "avatarUrl": "URL slike (opciono)",
+      "searchPlaceholder": "Pretraži igrače po imenu ili usernameu"
+    },
+    "addPlayer": {
+      "title": "Dodaj igrača",
+      "searchLabel": "Pretraži po imenu ili usernameu"
+    },
+    "editDialog": {
+      "title": "Uredi grupu"
+    },
+    "createDialog": {
+      "error": "Greška pri kreiranju grupe.",
+      "addAtLeastOne": "Dodaj najmanje jednog igrača."
+    },
+    "removeMember": {
+      "title": "Ukloni igrača",
+      "message": "Ukloni {{name}} iz grupe?",
+      "confirm": "Ukloni"
+    },
+    "leave": {
+      "title": "Napusti grupu",
+      "message": "Da li si siguran da želiš da napustiš ovu grupu?",
+      "confirm": "Napusti"
+    },
+    "detail": {
+      "members": "Članovi ({{count}})",
+      "history": "Istorija mečeva ({{count}})"
+    },
+    "stats": {
+      "hint": "Računaju se samo mečevi grupa protiv grupe sa unetim rezultatom.",
+      "loadError": "Greška pri učitavanju statistike.",
+      "mostPlayedAgainst": "Najčešće igrano protiv",
+      "noMatchesYet": "Još nema odigranih mečeva.",
+      "mostBeaten": "Najčešće pobeđivana",
+      "noWinsYet": "Još nema pobeda.",
+      "mostLostTo": "Najčešće gubljeno od",
+      "noLossesYet": "Još nema poraza.",
+      "title": "Statistika grupe",
+      "allOpponents": "Svi protivnici"
+    },
+    "chatButton": "Grupni čet"
+  },
   "logout": {
     "title": "Odjava",
     "message": "Da li si siguran da želiš da se odjaviš?"
@@ -291,6 +413,18 @@
       "periodWeek": "Nedelja",
       "periodMonth": "Mesec",
       "periodYear": "Godina"
+    }
+  },
+  "admin": {
+    "users": {
+      "title": "Korisnici",
+      "searchPlaceholder": "Pretraga po imenu, korisničkom imenu ili emailu...",
+      "loadError": "Greška prilikom učitavanja korisnika.",
+      "noResults": "Nema korisnika koji odgovaraju pretrazi.",
+      "colFirstName": "Ime",
+      "colLastName": "Prezime",
+      "colUsername": "Korisničko ime",
+      "colEmail": "Email"
     }
   },
   "errors": {
