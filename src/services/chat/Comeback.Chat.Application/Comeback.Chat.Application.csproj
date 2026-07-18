@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\building-blocks\Comeback.BuildingBlocks\Comeback.BuildingBlocks.csproj" />
+    <ProjectReference Include="..\Comeback.Chat.Domain\Comeback.Chat.Domain.csproj" />
+  </ItemGroup>
+</Project>

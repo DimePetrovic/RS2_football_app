@@ -28,6 +28,29 @@
     "logout": "Odjavi se",
     "search": "Pretraga"
   },
+  "chat": {
+    "title": "Poruke",
+    "noConversations": "Nemaš nijedan aktivan razgovor. Započni čet sa nekim igračem.",
+    "selectConversation": "Izaberi razgovor sa leve strane.",
+    "inputPlaceholder": "Napiši poruku...",
+    "startChat": "Pošalji poruku",
+    "typing": "kuca...",
+    "newChat": "Novi razgovor",
+    "searchPlaceholder": "Pretraži igrače...",
+    "conversationActions": "Opcije razgovora",
+    "messageActions": "Opcije poruke",
+    "deleteConversation": {
+      "action": "Obriši razgovor",
+      "title": "Obriši razgovor",
+      "message": "Obrisati razgovor sa {{name}}? Nestaće samo kod tebe — druga strana ga i dalje vidi.",
+      "confirm": "Obriši"
+    },
+    "deleteMessage": {
+      "action": "Obriši za mene"
+    },
+    "members": "Članovi",
+    "memberCount": "{{count}} članova"
+  },
   "auth": {
     "login": {
       "title": "Dobrodošao nazad",

@@ -1,0 +1,205 @@
+<div class="chat-layout">
+
+  <!-- Conversation list -->
+  <aside class="chat-sidebar" [class.chat-sidebar--hidden]="selectedId()">
+    <header class="chat-sidebar__header">
+      <h2 class="chat-sidebar__title">{{ 'chat.title' | translate }}</h2>
+      <button mat-icon-button (click)="showSearch.set(true)" [matTooltip]="'chat.newChat' | translate">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </header>
+
+    @if (showSearch()) {
+      <div class="chat-search">
+        <div class="chat-search__bar">
+          <mat-icon class="chat-search__icon">search</mat-icon>
+          <input class="chat-search__input"
+            [placeholder]="'chat.searchPlaceholder' | translate"
+            [value]="searchQuery()"
+            (input)="onSearchInput($any($event.target).value)"
+            autofocus />
+          <button mat-icon-button (click)="closeSearch()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        @if (searching()) {
+          <div class="chat-center" style="padding: 16px"><mat-spinner diameter="28" /></div>
+        } @else {
+          <ul class="conv-list">
+            @for (p of searchResults(); track p.userId) {
+              <li class="conv-item" (click)="openOrCreateConversation(p.userId, p.username)">
+                <div class="conv-item__avatar">{{ p.username[0] }}</div>
+                <div class="conv-item__body">
+                  <span class="conv-item__name">{{ p.username }}</span>
+                  <span class="conv-item__preview">{{ p.firstName }} {{ p.lastName }}</span>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
+
+    @if (loadingConvs()) {
+      <div class="chat-center"><mat-spinner diameter="40" /></div>
+    } @else if (conversations().length === 0) {
+      <div class="chat-center chat-empty">
+        <mat-icon class="chat-empty__icon">chat_bubble_outline</mat-icon>
+        <p>{{ 'chat.noConversations' | translate }}</p>
+      </div>
+    } @else {
+      <ul class="conv-list">
+        @for (conv of conversations(); track conv.conversationId) {
+          <li class="conv-item"
+            [class.conv-item--active]="conv.conversationId === selectedId()"
+            (click)="selectConversation(conv)">
+            <div class="conv-item__avatar">
+              @if (conv.avatarUrl) { <img [src]="conv.avatarUrl" [alt]="convName(conv)" /> }
+              @else if (isGroup(conv)) { <mat-icon>groups</mat-icon> }
+              @else { {{ convInitial(conv) }} }
+            </div>
+            <div class="conv-item__body">
+              <span class="conv-item__name" [class.conv-item__name--unread]="conv.hasUnread">{{ convName(conv) }}</span>
+              @if (conv.lastMessagePreview) {
+                <span class="conv-item__preview" [class.conv-item__preview--unread]="conv.hasUnread">{{ conv.lastMessagePreview }}</span>
+              }
+            </div>
+            <div class="conv-item__meta">
+              @if (conv.lastMessageAt) {
+                <span class="conv-item__time">{{ formatDate(conv.lastMessageAt) }}</span>
+              }
+              @if (conv.hasUnread) {
+                <span class="conv-item__unread-dot"></span>
+              }
+            </div>
+            <button mat-icon-button class="conv-item__menu"
+              [matMenuTriggerFor]="convMenu"
+              (click)="$event.stopPropagation()"
+              [attr.aria-label]="'chat.conversationActions' | translate">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #convMenu="matMenu">
+              <button mat-menu-item (click)="deleteConversation(conv, $event)">
+                <mat-icon>delete_outline</mat-icon>
+                <span>{{ 'chat.deleteConversation.action' | translate }}</span>
+              </button>
+            </mat-menu>
+          </li>
+        }
+      </ul>
+    }
+  </aside>
+
+  <!-- Chat window -->
+  <section class="chat-window" [class.chat-window--visible]="selectedId()">
+    @if (!selectedId()) {
+      <div class="chat-center chat-empty">
+        <mat-icon class="chat-empty__icon">forum</mat-icon>
+        <p>{{ 'chat.selectConversation' | translate }}</p>
+      </div>
+    } @else {
+      <header class="chat-window__header" [class.chat-window__header--clickable]="isGroup(selectedConversation())"
+        (click)="isGroup(selectedConversation()) && toggleMembers()">
+        <button mat-icon-button class="chat-window__back" (click)="$event.stopPropagation(); selectedId.set(null)">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div class="chat-window__avatar">
+          @if (selectedConversation()?.avatarUrl; as av) { <img [src]="av" [alt]="convName(selectedConversation())" /> }
+          @else if (isGroup(selectedConversation())) { <mat-icon>groups</mat-icon> }
+          @else { {{ convInitial(selectedConversation()) }} }
+        </div>
+        <div class="chat-window__title">
+          <span class="chat-window__name">{{ convName(selectedConversation()) }}</span>
+          @if (isGroup(selectedConversation())) {
+            <span class="chat-window__sub">{{ 'chat.memberCount' | translate: { count: memberCount() } }}</span>
+          }
+        </div>
+        @if (isGroup(selectedConversation())) {
+          <button mat-icon-button class="chat-window__members-toggle" (click)="$event.stopPropagation(); toggleMembers()"
+            [attr.aria-label]="'chat.members' | translate">
+            <mat-icon>{{ showMembers() ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </button>
+        }
+      </header>
+
+      @if (isGroup(selectedConversation()) && showMembers()) {
+        <div class="chat-members">
+          <span class="chat-members__title">{{ 'chat.members' | translate }} ({{ memberCount() }})</span>
+          <div class="chat-members__list">
+            @for (m of groupMembers(); track m.userId) {
+              <app-player-badge size="sm"
+                [userId]="m.userId"
+                [avatarUrl]="m.avatarUrl"
+                [username]="m.username"
+                [name]="m.displayName" [countryCode]="m.nationality" />
+            }
+          </div>
+        </div>
+      }
+
+      <div class="chat-messages">
+        @if (loadingMsgs()) {
+          <div class="chat-center"><mat-spinner diameter="32" /></div>
+        } @else {
+          @for (msg of messages(); track msg.id; let i = $index) {
+            @if (showSenderBadge(i)) {
+              <app-player-badge class="msg-sender" size="sm"
+                [userId]="msg.senderUserId"
+                [avatarUrl]="msg.senderAvatarUrl"
+                [username]="msg.senderUsername"
+                [name]="msg.senderDisplayName" [countryCode]="msg.senderNationality" />
+            }
+            <div class="msg" [class.msg--mine]="msg.senderUserId === myUserId()">
+              <div class="msg__bubble">
+                <p class="msg__text">{{ msg.content }}</p>
+                <div class="msg__footer">
+                  <span class="msg__time">{{ formatTime(msg.sentAt) }}</span>
+                  @if (msg.senderUserId === myUserId()) {
+                    <mat-icon class="msg__status" [class.msg__status--read]="msg.isRead">done_all</mat-icon>
+                  }
+                </div>
+              </div>
+              <button mat-icon-button class="msg__menu"
+                [matMenuTriggerFor]="msgMenu"
+                [attr.aria-label]="'chat.messageActions' | translate">
+                <mat-icon>more_horiz</mat-icon>
+              </button>
+              <mat-menu #msgMenu="matMenu">
+                <button mat-menu-item (click)="deleteMessage(msg, $event)">
+                  <mat-icon>delete_outline</mat-icon>
+                  <span>{{ 'chat.deleteMessage.action' | translate }}</span>
+                </button>
+              </mat-menu>
+            </div>
+          }
+          <div #messagesEnd></div>
+        }
+      </div>
+
+      @if (typingName()) {
+        <div class="typing-indicator">
+          <span class="typing-indicator__dots">
+            <span></span><span></span><span></span>
+          </span>
+          <span class="typing-indicator__text">{{ typingName() }} {{ 'chat.typing' | translate }}</span>
+        </div>
+      }
+
+      <div class="chat-input">
+        <textarea class="chat-input__field"
+          [placeholder]="'chat.inputPlaceholder' | translate"
+          [value]="messageText()"
+          (input)="messageText.set($any($event.target).value); onTyping()"
+          (keydown)="onKeydown($event)"
+          rows="1">
+        </textarea>
+        <button mat-icon-button color="primary"
+          [disabled]="!messageText().trim() || sending()"
+          (click)="send()">
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
+    }
+  </section>
+
+</div>
