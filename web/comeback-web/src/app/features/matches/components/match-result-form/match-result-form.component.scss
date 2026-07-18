@@ -1,0 +1,107 @@
+.match-result-form {
+  &__actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__hint {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--cb-text-secondary);
+  }
+
+  &__error {
+    margin: 0 0 12px;
+    font-size: 0.85rem;
+    color: var(--cb-error);
+  }
+
+  &__form {
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid var(--cb-border);
+    border-radius: 12px;
+
+    h3 { margin: 0 0 16px; font-size: 1rem; }
+  }
+
+  &__score-inputs {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  &__score-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+
+    label { font-size: 0.8rem; color: var(--cb-text-secondary); }
+  }
+
+  &__score-sep {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 20px;
+  }
+
+  &__form-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+.score-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--cb-border);
+  border-radius: 8px;
+  background: var(--cb-surface);
+  color: var(--cb-text);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+
+  &:focus { border-color: var(--cb-primary); }
+}
+
+.goals-form {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--cb-text-secondary);
+  }
+
+  &__tally {
+    font-weight: 700;
+    color: var(--cb-primary);
+  }
+}
+
+.goal-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  &__select {
+    flex: 1;
+    min-width: 120px;
+    border: 1px solid var(--cb-border);
+    border-radius: 6px;
+    padding: 4px 8px;
+  }
+}

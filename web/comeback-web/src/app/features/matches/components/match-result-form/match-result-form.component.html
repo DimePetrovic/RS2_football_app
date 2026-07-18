@@ -1,0 +1,86 @@
+@if (!showForm()) {
+  <div class="match-result-form__actions">
+    <button mat-raised-button color="primary" (click)="open()" [disabled]="!enabled">
+      <mat-icon>scoreboard</mat-icon> {{ 'match.detail.submitResult' | translate }}
+    </button>
+    @if (!enabled) {
+      <p class="match-result-form__hint">
+        @if (!timeOver) {
+          {{ 'match.detail.resultHintTime' | translate:{ time: endsAtFormatted } }}
+        } @else if (!enoughPlayers) {
+          {{ 'match.detail.resultHintPlayers' | translate:{ count: missingPlayers } }}
+        }
+      </p>
+    }
+  </div>
+} @else {
+  <div class="match-result-form__form">
+    <h3>{{ 'match.detail.enterResult' | translate }}</h3>
+    <div class="match-result-form__score-inputs">
+      <div class="match-result-form__score-field">
+        <label>{{ 'match.detail.teamHome' | translate }}</label>
+        <input type="number" min="0" [value]="homeScore()"
+          (input)="homeScore.set(+$any($event.target).value)" class="score-input" />
+      </div>
+      <span class="match-result-form__score-sep">:</span>
+      <div class="match-result-form__score-field">
+        <label>{{ 'match.detail.teamAway' | translate }}</label>
+        <input type="number" min="0" [value]="awayScore()"
+          (input)="awayScore.set(+$any($event.target).value)" class="score-input" />
+      </div>
+    </div>
+
+    <div class="goals-form">
+      <div class="goals-form__header">
+        <span>{{ 'match.detail.goalsTitle' | translate }}</span>
+        <span class="goals-form__tally">
+          {{ homeGoalsEntered() }}/{{ homeScore() }} — {{ awayGoalsEntered() }}/{{ awayScore() }}
+        </span>
+      </div>
+
+      @for (g of goalEntries(); track $index) {
+        <div class="goal-row">
+          <mat-select class="goal-row__select" [value]="g.scorerUserId"
+            [placeholder]="'match.detail.scorer' | translate"
+            (selectionChange)="updateGoalEntry($index, { scorerUserId: $event.value })">
+            @for (p of eligibleScorers; track p.userId) {
+              <mat-option [value]="p.userId">{{ p.displayName }}</mat-option>
+            }
+          </mat-select>
+
+          <mat-checkbox [checked]="g.isOwnGoal"
+            (change)="updateGoalEntry($index, { isOwnGoal: $event.checked })">
+            {{ 'match.detail.ownGoal' | translate }}
+          </mat-checkbox>
+
+          @if (!g.isOwnGoal) {
+            <mat-select class="goal-row__select" [value]="g.assistUserId"
+              [placeholder]="'match.detail.assist' | translate"
+              (selectionChange)="updateGoalEntry($index, { assistUserId: $event.value })">
+              <mat-option [value]="null">{{ 'match.detail.noAssist' | translate }}</mat-option>
+              @for (p of assistOptionsFor(g); track p.userId) {
+                <mat-option [value]="p.userId">{{ p.displayName }}</mat-option>
+              }
+            </mat-select>
+          }
+
+          <button mat-icon-button (click)="removeGoalEntry($index)">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      }
+
+      <button mat-stroked-button type="button" (click)="addGoalEntry()" [disabled]="eligibleScorers.length === 0">
+        <mat-icon>add</mat-icon> {{ 'match.detail.addGoal' | translate }}
+      </button>
+    </div>
+
+    @if (error()) {
+      <p class="match-result-form__error">{{ error() }}</p>
+    }
+    <div class="match-result-form__form-actions">
+      <button mat-raised-button color="primary" (click)="submit()" [disabled]="!canConfirm()">{{ 'common.confirm' | translate }}</button>
+      <button mat-button (click)="close()">{{ 'common.dismiss' | translate }}</button>
+    </div>
+  </div>
+}
