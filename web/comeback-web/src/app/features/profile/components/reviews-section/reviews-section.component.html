@@ -1,0 +1,37 @@
+@if (all().length > 0) {
+  <section class="profile-section">
+    <div class="section-header">
+      <span class="section-title">{{ 'profile.reviewsTitle' | translate }}</span>
+      @if (collapsible()) {
+        <button mat-button class="see-all-btn" (click)="showAll.set(!showAll())">
+          {{ showAll() ? ('common.showLess' | translate) : ('common.showAll' | translate: { count: all().length }) }}
+        </button>
+      }
+    </div>
+    <ul class="card-list">
+      @for (r of visible(); track r.createdAt) {
+        <li class="card-item">
+          <div class="card-item__row">
+            <app-player-badge class="card-item__title" size="sm"
+              [userId]="r.reviewerUserId" [avatarUrl]="r.reviewerAvatarUrl"
+              [username]="r.reviewerUsername" [name]="r.reviewerDisplayName" [countryCode]="r.reviewerNationality" />
+            <span class="card-item__date">{{ r.createdAt | date:'d.M.yyyy' }}</span>
+          </div>
+          <div class="card-item__row card-item__row--ratings">
+            <span class="inline-rating inline-rating--main">
+              <mat-icon>star</mat-icon>{{ r.overallRating }}
+            </span>
+            @if (r.goalkeepingRating) { <span class="inline-rating">{{ 'profile.ratingShort.goalkeeping' | translate }}: {{ r.goalkeepingRating }}</span> }
+            @if (r.defenseRating)    { <span class="inline-rating">{{ 'profile.ratingShort.defense' | translate }}: {{ r.defenseRating }}</span> }
+            @if (r.attackRating)     { <span class="inline-rating">{{ 'profile.ratingShort.attack' | translate }}: {{ r.attackRating }}</span> }
+            @if (r.effortRating)     { <span class="inline-rating">{{ 'profile.ratingShort.effort' | translate }}: {{ r.effortRating }}</span> }
+          </div>
+          @if (r.comment) {
+            <p class="card-item__comment">"{{ r.comment }}"</p>
+          }
+          <span class="card-item__sub">{{ r.matchTitle }}</span>
+        </li>
+      }
+    </ul>
+  </section>
+}

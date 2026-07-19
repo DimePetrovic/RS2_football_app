@@ -1,0 +1,57 @@
+@if (visible()) {
+  <mat-divider style="margin: 16px 0" />
+  <div class="match-media__title">{{ 'match.media.title' | translate }}</div>
+
+  @if (media().length === 0) {
+    <p class="match-media__empty">{{ 'match.media.empty' | translate }}</p>
+  } @else {
+    <div class="media-grid">
+      @for (item of media(); track item.id) {
+        <div class="media-item">
+          @if (item.mediaType === 'Video') {
+            <video class="media-item__content" controls preload="none"
+              [poster]="thumbnail(item)" [src]="item.url"></video>
+          } @else {
+            <a [href]="item.url" target="_blank" rel="noopener">
+              <img class="media-item__content" [src]="thumbnail(item)"
+                [alt]="item.uploaderDisplayName" loading="lazy" />
+            </a>
+          }
+          <div class="media-item__footer">
+            <span class="media-item__uploader">{{ item.uploaderDisplayName }}</span>
+            @if (canDelete(item)) {
+              <button mat-icon-button class="media-item__delete"
+                (click)="delete(item)"
+                [matTooltip]="'match.media.delete' | translate">
+                <mat-icon>delete</mat-icon>
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (canAdd) {
+    <div class="match-media__actions">
+      <button mat-stroked-button (click)="fileInput.click()" [disabled]="uploading()">
+        <mat-icon>add_photo_alternate</mat-icon>
+        @if (uploading()) {
+          {{ 'match.media.uploading' | translate:{
+            done: uploadProgress()?.done ?? 0,
+            total: uploadProgress()?.total ?? 0
+          } }}
+        } @else {
+          {{ 'match.media.add' | translate }}
+        }
+      </button>
+      <span class="match-media__hint">{{ 'match.media.hint' | translate }}</span>
+    </div>
+    @if (error()) {
+      <p class="match-media__error">{{ error()! | translate }}</p>
+    }
+    <input #fileInput type="file" hidden multiple
+      accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime"
+      (change)="onFilesSelected($event)" />
+  }
+}

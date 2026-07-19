@@ -1,0 +1,35 @@
+@if (all().length > 0) {
+  <section class="profile-section">
+    <div class="section-header">
+      <span class="section-title">{{ 'profile.matchesTitle' | translate }}</span>
+      @if (collapsible()) {
+        <button mat-button class="see-all-btn" (click)="showAll.set(!showAll())">
+          {{ showAll() ? ('common.showLess' | translate) : ('common.showAll' | translate: { count: all().length }) }}
+        </button>
+      }
+    </div>
+    <ul class="card-list">
+      @for (m of visible(); track m.matchId) {
+        <li class="card-item card-item--match" [routerLink]="['/matches', m.matchId]">
+          <div class="card-item__row">
+            <span class="card-item__title">{{ m.title }}</span>
+            <span class="card-item__date">{{ m.startsAt | date:'d.M.yy' }}</span>
+          </div>
+          <div class="card-item__row">
+            <span class="match-status match-status--{{ m.status.toLowerCase() }}">
+              {{ m.status | matchStatus }}
+            </span>
+            @if (m.homeScore !== null && m.awayScore !== null) {
+              <span class="match-score">{{ m.homeScore }} : {{ m.awayScore }}</span>
+            }
+            @if (m.team !== 'None') {
+              <span class="match-team match-team--{{ m.team.toLowerCase() }}">
+                {{ teamLabel(m.team) }}
+              </span>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  </section>
+}

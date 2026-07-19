@@ -1,0 +1,166 @@
+<div class="player-stats">
+  <div class="player-stats__back">
+    <button mat-icon-button (click)="goBack()"><mat-icon>arrow_back</mat-icon></button>
+  </div>
+  <h2 class="player-stats__title">{{ 'stats.advancedButton' | translate }}</h2>
+
+  @if (loading()) {
+    <div class="player-stats__loading"><mat-spinner diameter="40" /></div>
+  } @else if (error()) {
+    <p class="player-stats__error">{{ 'match.playerStats.loadError' | translate }}</p>
+  }
+
+  @if (stats(); as s) {
+
+    <!-- ── Stat cards ─────────────────────────────────────── -->
+    <div class="stat-tiles">
+      <div class="stat-tile">
+        <span class="stat-tile__value cb-mono">{{ s.organizedCount }}</span>
+        <span class="stat-tile__label">{{ 'match.playerStats.scheduledCount' | translate }}</span>
+        <span class="stat-tile__sub">{{ 'match.playerStats.organizedSub' | translate: { count: s.organizedWithResult, rate: organizeRate() } }}</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-tile__value cb-mono">{{ s.playedCount }}</span>
+        <span class="stat-tile__label">{{ 'match.playerStats.playedCount' | translate }}</span>
+        <span class="stat-tile__sub">{{ 'match.playerStats.playedSub' | translate }}</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-tile__value cb-mono">{{ winRate() }}%</span>
+        <span class="stat-tile__label">{{ 'stats.wins' | translate }}</span>
+        <span class="stat-tile__sub">{{ 'stats.ofCount' | translate: { value: s.wins, total: s.playedCount } }}</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-tile__value cb-mono">{{ drawRate() }}%</span>
+        <span class="stat-tile__label">{{ 'stats.draws' | translate }}</span>
+        <span class="stat-tile__sub">{{ 'stats.ofCount' | translate: { value: s.draws, total: s.playedCount } }}</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-tile__value cb-mono">{{ lossRate() }}%</span>
+        <span class="stat-tile__label">{{ 'stats.losses' | translate }}</span>
+        <span class="stat-tile__sub">{{ 'stats.ofCount' | translate: { value: s.losses, total: s.playedCount } }}</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-tile__value cb-mono">{{ s.goals }}</span>
+        <span class="stat-tile__label">{{ 'stats.goals' | translate }}</span>
+        <span class="stat-tile__sub">{{ 'match.playerStats.goalsSub' | translate }}</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-tile__value cb-mono">{{ s.assists }}</span>
+        <span class="stat-tile__label">{{ 'stats.assists' | translate }}</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-tile__value cb-mono">{{ groupCount() ?? '—' }}</span>
+        <span class="stat-tile__label">{{ 'match.playerStats.groupsMember' | translate }}</span>
+        @if (topGroup(); as g) {
+          <span class="stat-tile__sub">{{ 'match.playerStats.mostPlaysWith' | translate: { group: g.groupName, count: g.count } }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- ── Chart over time ──────────────────────────────── -->
+    <div class="player-stats__section">
+      <div class="player-stats__section-head">
+        <h3>{{ 'match.playerStats.matchesOverTime' | translate }}</h3>
+        <div class="period-tabs">
+          <button type="button" class="period-tab" [class.period-tab--active]="period() === 'week'"
+            (click)="period.set('week')">{{ 'match.playerStats.periodWeek' | translate }}</button>
+          <button type="button" class="period-tab" [class.period-tab--active]="period() === 'month'"
+            (click)="period.set('month')">{{ 'match.playerStats.periodMonth' | translate }}</button>
+          <button type="button" class="period-tab" [class.period-tab--active]="period() === 'year'"
+            (click)="period.set('year')">{{ 'match.playerStats.periodYear' | translate }}</button>
+        </div>
+      </div>
+      <app-stats-chart [buckets]="chartBuckets()" />
+    </div>
+
+    <!-- ── Top opponents ───────────────────────────────────── -->
+    <div class="player-stats__columns">
+      <div class="player-stats__section">
+        <h3>{{ 'match.playerStats.mostBeaten' | translate }}</h3>
+        @if (s.topBeaten.length === 0) {
+          <p class="player-stats__empty">{{ 'match.playerStats.noWinsYet' | translate }}</p>
+        } @else {
+          <ol class="top-list top-list--wins">
+            @for (o of s.topBeaten; track o.userId) {
+              <li [routerLink]="['/players', o.userId]">
+                <app-player-badge class="top-list__badge" size="sm"
+                  [avatarUrl]="o.avatarUrl" [username]="o.username" [name]="o.displayName" [countryCode]="o.nationality" />
+                <span class="top-list__count cb-mono">{{ o.count }}×</span>
+              </li>
+            }
+          </ol>
+        }
+      </div>
+      <div class="player-stats__section">
+        <h3>{{ 'match.playerStats.mostLostTo' | translate }}</h3>
+        @if (s.topLostTo.length === 0) {
+          <p class="player-stats__empty">{{ 'match.playerStats.noLossesYet' | translate }}</p>
+        } @else {
+          <ol class="top-list top-list--losses">
+            @for (o of s.topLostTo; track o.userId) {
+              <li [routerLink]="['/players', o.userId]">
+                <app-player-badge class="top-list__badge" size="sm"
+                  [avatarUrl]="o.avatarUrl" [username]="o.username" [name]="o.displayName" [countryCode]="o.nationality" />
+                <span class="top-list__count cb-mono">{{ o.count }}×</span>
+              </li>
+            }
+          </ol>
+        }
+      </div>
+    </div>
+
+    <!-- ── Search: matches with teammates ───────────────────── -->
+    <div class="player-stats__section">
+      <h3>{{ 'match.playerStats.matchesWithPlayer' | translate }}</h3>
+      <p class="player-stats__hint">{{ 'match.playerStats.searchHint' | translate }}</p>
+
+      @if (!selectedPlayer()) {
+        <app-player-search-field class="player-stats__search"
+          labelKey="match.playerStats.searchPlayer"
+          [excludedIds]="searchExcludedIds()"
+          (playerSelected)="selectPlayer($event)" />
+      } @else {
+        <div class="player-stats__selected-row">
+          <span class="player-stats__chip">
+            <app-player-badge size="sm" [avatarUrl]="selectedPlayer()!.avatarUrl"
+              [username]="selectedPlayer()!.username"
+              [name]="selectedPlayer()!.firstName + ' ' + selectedPlayer()!.lastName" />
+            <button type="button" mat-icon-button (click)="clearPlayer()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </span>
+
+          <div class="period-tabs">
+            <button type="button" class="period-tab" [class.period-tab--active]="relation() === 'All'"
+              (click)="setRelation('All')">{{ 'match.playerStats.relAll' | translate }}</button>
+            <button type="button" class="period-tab" [class.period-tab--active]="relation() === 'Teammate'"
+              (click)="setRelation('Teammate')">{{ 'match.playerStats.relTeammate' | translate }}</button>
+            <button type="button" class="period-tab" [class.period-tab--active]="relation() === 'Opponent'"
+              (click)="setRelation('Opponent')">{{ 'match.playerStats.relOpponent' | translate }}</button>
+          </div>
+        </div>
+      }
+
+      @if (searchLoading()) {
+        <div class="player-stats__loading"><mat-spinner diameter="28" /></div>
+      } @else if (filteredMatches()?.length === 0) {
+        <p class="player-stats__empty">{{ 'match.playerStats.noCommon' | translate }}</p>
+      } @else if (filteredMatches()) {
+        <ul class="match-list">
+          @for (m of filteredMatches()!; track m.matchId) {
+            <li class="match-list__item" [routerLink]="['/matches', m.matchId]">
+              <span class="match-list__outcome match-list__outcome--{{ outcomeFor(m) }}">
+                {{ outcomeFor(m) === 'win' ? ('stats.abbrWins' | translate) : outcomeFor(m) === 'draw' ? ('stats.abbrDraws' | translate) : outcomeFor(m) === 'loss' ? ('stats.abbrLosses' | translate) : '·' }}
+              </span>
+              <div class="match-list__body">
+                <span class="match-list__title">{{ m.title }}</span>
+                <span class="match-list__date">{{ m.startsAt | date:'d. MMM yyyy, HH:mm' }}</span>
+              </div>
+              <span class="match-list__score cb-mono">{{ m.homeScore }} : {{ m.awayScore }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+</div>

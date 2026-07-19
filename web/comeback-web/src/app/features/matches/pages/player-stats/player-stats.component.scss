@@ -1,0 +1,203 @@
+@use '../../../../shared/styles/stats-cards';
+.player-stats {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px;
+
+  &__back { margin-bottom: 4px; }
+
+  &__title {
+    margin: 0 0 16px;
+  }
+
+  &__loading {
+    display: flex;
+    justify-content: center;
+    padding: 32px 0;
+  }
+
+  &__error {
+    color: var(--cb-error);
+  }
+
+  &__section {
+    background: var(--cb-surface);
+    border: 1px solid var(--cb-border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+
+    h3 { margin: 0 0 8px; font-size: 15px; }
+  }
+
+  &__section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+
+    h3 { margin: 0; }
+  }
+
+  &__columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    @media (max-width: 560px) { grid-template-columns: 1fr; }
+  }
+
+  &__empty, &__hint {
+    color: var(--cb-text-muted);
+    font-size: 13px;
+    margin: 4px 0;
+  }
+
+  &__search { width: 100%; margin-top: 8px; }
+
+  &__search-sub {
+    color: var(--cb-text-muted);
+    font-size: 12px;
+    margin-left: 8px;
+  }
+
+  &__chips {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0;
+    margin: 0 0 12px;
+  }
+
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background: var(--cb-surface-2);
+    border: 1px solid var(--cb-border);
+    border-radius: 16px;
+    padding: 2px 4px 2px 12px;
+    font-size: 13px;
+
+    button { width: 24px; height: 24px; padding: 0; }
+    mat-icon { font-size: 14px; width: 14px; height: 14px; }
+  }
+}
+
+
+
+.period-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.period-tab {
+  background: none;
+  border: 1px solid var(--cb-border);
+  border-radius: 14px;
+  color: var(--cb-text-muted);
+  font-size: 12px;
+  padding: 3px 12px;
+  cursor: pointer;
+
+  &--active {
+    background: color-mix(in srgb, var(--cb-primary) 16%, transparent);
+    border-color: var(--cb-primary);
+    color: var(--cb-text);
+  }
+}
+
+
+.match-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--cb-border);
+    cursor: pointer;
+
+    &:last-child { border-bottom: none; }
+  }
+
+  &__outcome {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+
+    // The W/D/L badge carries a letter, not just color
+    &--win { background: color-mix(in srgb, var(--cb-success) 22%, transparent); color: var(--cb-success); }
+    &--draw { background: var(--cb-surface-2); color: var(--cb-text-secondary); }
+    &--loss { background: color-mix(in srgb, var(--cb-error) 20%, transparent); color: var(--cb-error); }
+    &--none { background: var(--cb-surface-2); color: var(--cb-text-muted); }
+  }
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__title { color: var(--cb-text); }
+
+  &__date {
+    font-size: 12px;
+    color: var(--cb-text-muted);
+  }
+
+  &__score { color: var(--cb-text-secondary); }
+}
+
+.top-list__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cb-surface-2);
+  color: var(--cb-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &--option {
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+}
+
+.player-stats__selected-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 8px 0 12px;
+}
+
+.top-list__badge {
+  flex: 1;
+  min-width: 0;
+}
+
+.top-list li { cursor: pointer; }

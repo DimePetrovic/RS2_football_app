@@ -1,0 +1,83 @@
+<div class="stats-chart">
+  <div class="stats-chart__header">
+    <div class="stats-chart__legend">
+      <span class="stats-chart__legend-item">
+        <span class="stats-chart__dot stats-chart__dot--wins"></span> {{ 'stats.wins' | translate }}
+      </span>
+      <span class="stats-chart__legend-item">
+        <span class="stats-chart__dot stats-chart__dot--draws"></span> {{ 'stats.draws' | translate }}
+      </span>
+      <span class="stats-chart__legend-item">
+        <span class="stats-chart__dot stats-chart__dot--losses"></span> {{ 'stats.losses' | translate }}
+      </span>
+    </div>
+    <button type="button" class="stats-chart__table-toggle" (click)="showTable.set(!showTable())">
+      {{ showTable() ? ('stats.chart' | translate) : ('stats.table' | translate) }}
+    </button>
+  </div>
+
+  @if (!showTable()) {
+    <div class="stats-chart__plot">
+      <svg [attr.viewBox]="viewBox" preserveAspectRatio="xMidYMid meet" role="img"
+        [attr.aria-label]="'stats.chartAria' | translate">
+        @for (tick of yTicks(); track tick.value) {
+          <line class="stats-chart__grid" [attr.x1]="28" [attr.x2]="plotWidth - 6"
+            [attr.y1]="tick.y" [attr.y2]="tick.y" />
+          <text class="stats-chart__axis-label" [attr.x]="24" [attr.y]="tick.y + 3"
+            text-anchor="end">{{ tick.value }}</text>
+        }
+        <line class="stats-chart__baseline" [attr.x1]="28" [attr.x2]="plotWidth - 6"
+          [attr.y1]="baseline" [attr.y2]="baseline" />
+
+        @for (bar of bars(); track $index) {
+          @if (bar.winsPath) {
+            <path [attr.d]="bar.winsPath" class="stats-chart__bar-wins"
+              [class.stats-chart__bar--dim]="hovered() !== null && hovered() !== $index" />
+          }
+          @if (bar.drawsPath) {
+            <path [attr.d]="bar.drawsPath" class="stats-chart__bar-draws"
+              [class.stats-chart__bar--dim]="hovered() !== null && hovered() !== $index" />
+          }
+          @if (bar.lossesPath) {
+            <path [attr.d]="bar.lossesPath" class="stats-chart__bar-losses"
+              [class.stats-chart__bar--dim]="hovered() !== null && hovered() !== $index" />
+          }
+          @if (bar.showLabel) {
+            <text class="stats-chart__axis-label" [attr.x]="bar.x + bar.barWidth / 2"
+              [attr.y]="baseline + 14" text-anchor="middle">{{ bar.bucket.label }}</text>
+          }
+          <!-- invisible zone wider than the bar — easier hover -->
+          <rect [attr.x]="bar.x - 4" [attr.y]="0" [attr.width]="bar.barWidth + 8"
+            [attr.height]="baseline" fill="transparent"
+            (mouseenter)="hovered.set($index)" (mouseleave)="hovered.set(null)" />
+        }
+      </svg>
+
+      @if (hoveredBar(); as bar) {
+        <div class="stats-chart__tooltip" [style.left.%]="tooltipX(bar)">
+          <div class="stats-chart__tooltip-title">{{ bar.bucket.label }} — {{ bar.total }} {{ bar.total === 1 ? ('stats.matchOne' | translate) : ('stats.matchMany' | translate) }}</div>
+          <div><span class="stats-chart__dot stats-chart__dot--wins"></span> {{ 'stats.wins' | translate }}: <strong>{{ bar.bucket.wins }}</strong></div>
+          <div><span class="stats-chart__dot stats-chart__dot--draws"></span> {{ 'stats.draws' | translate }}: <strong>{{ bar.bucket.draws }}</strong></div>
+          <div><span class="stats-chart__dot stats-chart__dot--losses"></span> {{ 'stats.losses' | translate }}: <strong>{{ bar.bucket.losses }}</strong></div>
+        </div>
+      }
+    </div>
+  } @else {
+    <table class="stats-chart__table">
+      <thead>
+        <tr><th>{{ 'stats.period' | translate }}</th><th>{{ 'stats.total' | translate }}</th><th>{{ 'stats.wins' | translate }}</th><th>{{ 'stats.draws' | translate }}</th><th>{{ 'stats.losses' | translate }}</th></tr>
+      </thead>
+      <tbody>
+        @for (bar of bars(); track $index) {
+          <tr>
+            <td>{{ bar.bucket.label }}</td>
+            <td>{{ bar.total }}</td>
+            <td>{{ bar.bucket.wins }}</td>
+            <td>{{ bar.bucket.draws }}</td>
+            <td>{{ bar.bucket.losses }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
