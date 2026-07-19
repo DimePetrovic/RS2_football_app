@@ -53,6 +53,24 @@ services:
       timeout: 5s
       retries: 5
 
+  postgres-chat:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: comeback_chat
+      POSTGRES_USER: comeback
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-comeback_dev}
+    ports:
+      - "5437:5432"
+    volumes:
+      - postgres-chat-data:/var/lib/postgresql/data
+    networks:
+      - comeback-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U comeback -d comeback_chat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   postgres-notification:
     image: postgres:16-alpine
     environment:
@@ -243,6 +261,32 @@ services:
       - comeback-network
     restart: on-failure
 
+  chat-api:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: chat
+        SERVICE_NAME: Chat
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Services__ProfileApi: http://profile-api:8080
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__DefaultConnection: "Host=postgres-chat;Port=5432;Database=comeback_chat;Username=comeback;Password=${POSTGRES_PASSWORD:-comeback_dev}"
+      JwtSettings__Secret: ${JWT_SECRET:-dev-secret-min-32-chars-comeback-auth-2026}
+      JwtSettings__Issuer: comeback-auth
+      JwtSettings__Audience: comeback-api
+      Chat__EncryptionKey: ${CHAT_ENCRYPTION_KEY:-Q29tZWJhY2tDaGF0RW5jcnlwdGlvbktleTIwMjYhISE=}
+      Seq__ServerUrl: http://seq:5341
+    ports:
+      - "5610:8080"
+    depends_on:
+      postgres-chat:
+        condition: service_healthy
+    networks:
+      - comeback-network
+    restart: on-failure
+
   notification-api:
     build:
       context: ../..
@@ -283,6 +327,7 @@ services:
 # ── Volumes ──────────────────────────────────────────────────
 
 volumes:
+  postgres-chat-data:
   postgres-auth-data:
   postgres-profile-data:
   postgres-match-data:
