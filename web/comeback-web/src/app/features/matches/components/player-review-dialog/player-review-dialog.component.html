@@ -1,0 +1,73 @@
+<h2 mat-dialog-title class="prd-title">
+  {{ 'match.review.title' | translate }}
+  <span class="prd-progress">{{ currentIndex() + 1 }} / {{ data.players.length }}</span>
+</h2>
+
+<mat-dialog-content class="prd-content">
+  <div class="prd-player">
+    <div class="prd-avatar">{{ initials(currentPlayer().displayName) }}</div>
+    <div class="prd-name">{{ currentPlayer().displayName }}</div>
+  </div>
+
+  <div class="prd-section">
+    <span class="prd-label">{{ 'match.review.overall' | translate }} <span class="prd-required">*</span></span>
+    <div class="prd-chips">
+      @for (val of ratingValues; track val) {
+        <button class="prd-chip"
+          [class.prd-chip--sel]="overallRating() === val"
+          (click)="overallRating.set(val)">
+          {{ fmt(val) }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @for (spec of specs; track spec.key) {
+    <div class="prd-section prd-section--spec">
+      <span class="prd-label">
+        {{ spec.labelKey | translate }}
+        <span class="prd-optional">{{ 'match.review.optional' | translate }}</span>
+      </span>
+      <div class="prd-chips">
+        @for (val of ratingValues; track val) {
+          <button class="prd-chip prd-chip--sm"
+            [class.prd-chip--sel]="getSpec(spec.key) === val"
+            (click)="setSpec(spec.key, val)">
+            {{ fmt(val) }}
+          </button>
+        }
+        <button class="prd-chip prd-chip--sm prd-chip--na"
+          [class.prd-chip--sel]="getSpec(spec.key) === null"
+          (click)="setSpec(spec.key, null)">
+          N/A
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="prd-section">
+    <span class="prd-label">
+      {{ 'match.review.comment' | translate }}
+      <span class="prd-optional">{{ 'match.review.optional' | translate }}</span>
+    </span>
+    <textarea class="prd-comment"
+      [placeholder]="'match.review.commentPlaceholder' | translate"
+      rows="3"
+      [value]="comment()"
+      (input)="comment.set($any($event.target).value)">
+    </textarea>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="prd-actions">
+  <button mat-button (click)="cancel()">{{ 'common.dismiss' | translate }}</button>
+  <span class="prd-spacer"></span>
+  <button mat-button (click)="skip()">{{ 'common.skip' | translate }}</button>
+  <button mat-raised-button color="primary" [disabled]="!canSubmit()" (click)="submit()">
+    @if (submitting()) {
+      <mat-spinner diameter="18" />
+    } @else {
+      {{ (isLast() ? 'match.review.submitLast' : 'match.review.submit') | translate }}
+    }
+  </button>
+</mat-dialog-actions>

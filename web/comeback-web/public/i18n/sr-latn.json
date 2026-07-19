@@ -558,5 +558,34 @@
       "conversation.self": "Ne možeš započeti razgovor sa samim sobom.",
       "profile.invalid_nationality": "Nepoznata oznaka nacionalnosti."
     }
+  },
+  "media": {
+    "errors": {
+      "imageTooLarge": "Slika je prevelika (najviše 10 MB).",
+      "videoTooLarge": "Snimak je prevelik (najviše 100 MB).",
+      "unsupportedType": "Format fajla nije podržan (JPG, PNG, WebP, MP4, WebM, MOV).",
+      "uploadFailed": "Otpremanje nije uspelo. Pokušaj ponovo."
+    }
+  },
+  "stats": {
+    "advancedButton": "Napredna statistika",
+    "wins": "Pobede",
+    "draws": "Nerešeno",
+    "losses": "Porazi",
+    "chartAria": "Ishodi odigranih mečeva kroz vreme",
+    "matchOne": "meč",
+    "matchMany": "mečeva",
+    "period": "Period",
+    "total": "Ukupno",
+    "played": "Odigrano",
+    "chart": "Grafikon",
+    "table": "Tabela",
+    "group": "Grupa",
+    "ofCount": "{{value}} od {{total}}",
+    "abbrWins": "P",
+    "abbrDraws": "N",
+    "abbrLosses": "I",
+    "goals": "Golovi",
+    "assists": "Asistencije"
   }
 }

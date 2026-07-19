@@ -1,0 +1,122 @@
+// Boje serija su validirane (dataviz palette validator) za #22252C i #181B20 podloge.
+$wins-color: #7fa314;
+$draws-color: #4e7fd0;
+$losses-color: #d06a4e;
+
+.stats-chart {
+  position: relative;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  &__legend {
+    display: flex;
+    gap: 16px;
+  }
+
+  &__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--cb-text-secondary);
+  }
+
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+
+    &--wins { background: $wins-color; }
+    &--draws { background: $draws-color; }
+    &--losses { background: $losses-color; }
+  }
+
+  &__table-toggle {
+    background: none;
+    border: 1px solid var(--cb-border);
+    border-radius: 14px;
+    color: var(--cb-text-muted);
+    font-size: 12px;
+    padding: 2px 12px;
+    cursor: pointer;
+
+    &:hover { color: var(--cb-text); }
+  }
+
+  &__plot {
+    position: relative;
+  }
+
+  svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  &__grid {
+    stroke: var(--cb-border);
+    stroke-opacity: 0.4;
+    stroke-width: 1;
+  }
+
+  &__baseline {
+    stroke: var(--cb-border);
+    stroke-width: 1;
+  }
+
+  &__axis-label {
+    fill: var(--cb-text-muted);
+    font-size: 10px;
+  }
+
+  &__bar-wins { fill: $wins-color; }
+  &__bar-draws { fill: $draws-color; }
+  &__bar-losses { fill: $losses-color; }
+
+  &__bar--dim { opacity: 0.35; }
+
+  &__tooltip {
+    position: absolute;
+    top: 0;
+    transform: translateX(-20%);
+    pointer-events: none;
+    background: var(--cb-surface-2);
+    border: 1px solid var(--cb-border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--cb-text-secondary);
+    display: grid;
+    gap: 2px;
+    white-space: nowrap;
+    z-index: 2;
+
+    strong { color: var(--cb-text); }
+  }
+
+  &__tooltip-title {
+    color: var(--cb-text);
+    font-weight: 600;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+
+    th, td {
+      text-align: left;
+      padding: 4px 8px;
+      border-bottom: 1px solid var(--cb-border);
+      color: var(--cb-text-secondary);
+    }
+
+    th { color: var(--cb-text-muted); font-weight: 500; }
+  }
+}
