@@ -1,0 +1,155 @@
+<div class="feed-page">
+  <h2 class="feed-page__title">{{ 'feed.title' | translate }}</h2>
+
+  @if (loading()) {
+    <div class="feed-center"><mat-spinner diameter="40" /></div>
+  } @else if (error()) {
+    <div class="feed-center feed-empty">
+      <mat-icon class="feed-empty__icon">error_outline</mat-icon>
+      <p>{{ 'feed.loadError' | translate }}</p>
+      <button mat-button (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (posts().length === 0) {
+    <div class="feed-center feed-empty">
+      <mat-icon class="feed-empty__icon">dynamic_feed</mat-icon>
+      <p>{{ 'feed.empty' | translate }}</p>
+    </div>
+  } @else {
+    <ul class="post-list">
+      @for (post of posts(); track post.id) {
+        @if (post.type === 'PlayerWanted') {
+        <li class="post-card wanted-card" (click)="openMatch(post, $event)">
+          <div class="wanted-card__banner">
+            <mat-icon>campaign</mat-icon>
+            <span>{{ 'feed.wanted.banner' | translate }}</span>
+          </div>
+          <div class="wanted-card__subject">{{ wantedSubject(post) }}</div>
+          <div class="wanted-card__match">
+            <span class="wanted-card__for">{{ 'feed.wanted.forMatch' | translate }}</span>
+            <span class="wanted-card__title">{{ post.matchTitle }}</span>
+          </div>
+          <div class="post-card__meta">
+            @if (post.location) {
+              <span class="post-card__meta-item"><mat-icon>location_on</mat-icon>{{ post.location }}</span>
+            }
+            @if (post.playedAt) {
+              <span class="post-card__meta-item"><mat-icon>event</mat-icon>{{ post.playedAt | date:'d. MMM yyyy, HH:mm' }}</span>
+            }
+          </div>
+          <div class="wanted-card__footer" (click)="$event.stopPropagation()">
+            @if (post.organizerUserId) {
+              <app-player-badge size="sm" [userId]="post.organizerUserId" [avatarUrl]="post.organizerAvatarUrl" [username]="post.organizerUsername" [name]="post.organizerDisplayName" [countryCode]="post.organizerNationality" />
+            }
+            @if (!isMyPost(post)) {
+              <div class="wanted-card__cta">
+                <button mat-stroked-button class="wanted-card__msg" (click)="messageOrganizer(post, $event)"
+                  [attr.aria-label]="'feed.wanted.message' | translate">
+                  <mat-icon>chat</mat-icon>
+                  <span class="wanted-card__btn-label">{{ 'feed.wanted.message' | translate }}</span>
+                </button>
+                @if (hasApplied(post)) {
+                  <button type="button" class="wanted-card__applied" (click)="confirmWithdraw(post, $event)"
+                    [matTooltip]="'feed.wanted.withdrawDialog.title' | translate">
+                    <mat-icon>check_circle</mat-icon>
+                    <span class="wanted-card__btn-label">{{ 'feed.wanted.appliedShort' | translate }}</span>
+                  </button>
+                } @else {
+                  <button mat-raised-button class="cb-btn-primary wanted-card__apply" (click)="applyToMatch(post, $event)">
+                    <mat-icon>person_add</mat-icon>
+                    <span class="wanted-card__btn-label">{{ 'feed.wanted.apply' | translate }}</span>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </li>
+        } @else {
+        <li class="post-card" (click)="openPost(post)">
+          <div class="post-card__header">
+            <span class="post-card__badge">{{ 'feed.fullTime' | translate }}</span>
+            <span class="post-card__title">{{ post.matchTitle }}</span>
+          </div>
+
+          <div class="scoreboard">
+            <span class="scoreboard__team scoreboard__team--home"
+              [class.scoreboard__team--winner]="winner(post) === 'Home'">
+              {{ post.homeTeamName || ('feed.homeTeam' | translate) }}
+            </span>
+            <span class="scoreboard__score cb-mono">
+              {{ post.homeScore }}<span class="scoreboard__colon">:</span>{{ post.awayScore }}
+            </span>
+            <span class="scoreboard__team scoreboard__team--away"
+              [class.scoreboard__team--winner]="winner(post) === 'Away'">
+              {{ post.awayTeamName || ('feed.awayTeam' | translate) }}
+            </span>
+          </div>
+
+          <div class="post-card__meta">
+            @if (post.location) {
+              <span class="post-card__meta-item">
+                <mat-icon>location_on</mat-icon>{{ post.location }}
+              </span>
+            }
+            <span class="post-card__meta-item">
+              <mat-icon>event</mat-icon>{{ (post.playedAt || post.createdAt) | date:'d. MMM yyyy, HH:mm' }}
+            </span>
+          </div>
+
+          @if (post.players.length > 0) {
+            <div class="mini-teams" (click)="$event.stopPropagation()">
+              @for (side of [homeTeam(post), awayTeam(post)]; track $index) {
+                <div class="mini-team">
+                  @for (p of side; track p.userId) {
+                    <div class="mini-player">
+                      <app-player-badge class="mini-player__badge" size="sm"
+                        [avatarUrl]="p.avatarUrl" [username]="p.username"
+                        [name]="p.displayName" [userId]="p.userId" [countryCode]="p.nationality" />
+                      @if (p.isCaptain) { <mat-icon class="mini-player__captain">star</mat-icon> }
+                      @if (p.userId === motmUserId(post)) { <span class="mini-motm">MOTM</span> }
+                      @if (p.goals > 0) { <span class="mini-stat cb-mono">⚽{{ p.goals }}</span> }
+                      @if (p.assists > 0) { <span class="mini-stat cb-mono">🅰{{ p.assists }}</span> }
+                      @if (p.ownGoals > 0) { <span class="mini-stat mini-stat--own cb-mono">AG{{ p.ownGoals }}</span> }
+                      @if (p.overallRating !== null) { <span class="mini-rating cb-mono">{{ p.overallRating.toFixed(1) }}</span> }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          @if (post.canInteract) {
+            <div class="post-card__actions" (click)="$event.stopPropagation()">
+              <button mat-button (click)="toggleLike(post)">
+                <mat-icon [class.post-card__liked]="post.likedByMe">
+                  {{ post.likedByMe ? 'favorite' : 'favorite_border' }}
+                </mat-icon>
+                {{ post.likeCount }}
+              </button>
+              <button mat-button [routerLink]="['/feed', post.id]">
+                <mat-icon>chat_bubble_outline</mat-icon>
+                {{ post.commentCount }}
+              </button>
+              <button mat-button (click)="share(post, $event)">
+                <mat-icon>share</mat-icon>
+                {{ 'feed.share' | translate }}
+              </button>
+            </div>
+          }
+        </li>
+        }
+      }
+    </ul>
+
+    @if (hasMore()) {
+      <div class="feed-center">
+        <button mat-stroked-button [disabled]="loadingMore()" (click)="loadMore()">
+          @if (loadingMore()) {
+            <mat-spinner diameter="20" />
+          } @else {
+            {{ 'feed.loadMore' | translate }}
+          }
+        </button>
+      </div>
+    }
+  }
+</div>

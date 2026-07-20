@@ -1,0 +1,166 @@
+<div class="post-detail">
+  <div class="post-detail__back">
+    <button mat-icon-button (click)="goBack()"><mat-icon>arrow_back</mat-icon></button>
+  </div>
+
+  @if (loading()) {
+    <div class="post-detail__center"><mat-spinner diameter="40" /></div>
+  } @else if (error()) {
+    <div class="post-detail__center">
+      <p>{{ 'feed.loadError' | translate }}</p>
+      <button mat-button (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (post()) {
+    <div class="post-card">
+      <div class="post-card__header">
+        <span class="post-card__badge">{{ 'feed.fullTime' | translate }}</span>
+        <span class="post-card__title">{{ post()!.matchTitle }}</span>
+      </div>
+
+      <div class="scoreboard">
+        <span class="scoreboard__team scoreboard__team--home"
+          [class.scoreboard__team--winner]="winner() === 'Home'">
+          {{ post()!.homeTeamName || ('feed.homeTeam' | translate) }}
+        </span>
+        <span class="scoreboard__score cb-mono">
+          {{ post()!.homeScore }}<span class="scoreboard__colon">:</span>{{ post()!.awayScore }}
+        </span>
+        <span class="scoreboard__team scoreboard__team--away"
+          [class.scoreboard__team--winner]="winner() === 'Away'">
+          {{ post()!.awayTeamName || ('feed.awayTeam' | translate) }}
+        </span>
+      </div>
+
+      <div class="post-card__meta">
+        @if (post()!.location) {
+          <span class="post-card__meta-item">
+            <mat-icon>location_on</mat-icon>{{ post()!.location }}
+          </span>
+        }
+        <span class="post-card__meta-item">
+          <mat-icon>event</mat-icon>{{ (post()!.playedAt || post()!.createdAt) | date:'EEEE, d. MMMM yyyy, HH:mm' }}
+        </span>
+      </div>
+
+      <a class="post-card__match-link" [routerLink]="['/matches', post()!.matchId]">
+        {{ 'feed.viewMatch' | translate }}
+      </a>
+
+      @if (post()!.players.length > 0) {
+        <div class="teams-grid">
+          <div class="team-column">
+            <div class="team-column__header">{{ post()!.homeTeamName || ('feed.homeTeam' | translate) }}</div>
+            @for (p of homeTeam(); track p.userId) {
+              <div class="player-row">
+                <div class="player-row__main">
+                  <app-player-badge class="player-row__badge" size="sm"
+                    [avatarUrl]="p.avatarUrl" [username]="p.username" [countryCode]="p.nationality"
+                    [name]="p.displayName" [userId]="p.userId" />
+                  @if (p.isCaptain) { <mat-icon class="player-row__captain">star</mat-icon> }
+                  @if (p.userId === motmUserId()) { <span class="player-row__motm">MOTM</span> }
+                  @if (p.overallRating !== null) {
+                    <span class="player-row__rating cb-mono">{{ p.overallRating.toFixed(1) }}</span>
+                  }
+                </div>
+                @if (p.goals > 0 || p.assists > 0 || p.ownGoals > 0) {
+                  <div class="player-row__stats">
+                    @if (p.goals > 0) { <span class="stat-badge">⚽ {{ p.goals }}</span> }
+                    @if (p.assists > 0) { <span class="stat-badge">🅰 {{ p.assists }}</span> }
+                    @if (p.ownGoals > 0) { <span class="stat-badge stat-badge--own">AG {{ p.ownGoals }}</span> }
+                  </div>
+                }
+                @if (p.comments.length > 0) {
+                  <ul class="player-row__comments">
+                    @for (c of p.comments; track $index) {
+                      <li><span class="player-row__comment-author">{{ c.reviewerDisplayName }}:</span> {{ c.comment }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="team-column">
+            <div class="team-column__header">{{ post()!.awayTeamName || ('feed.awayTeam' | translate) }}</div>
+            @for (p of awayTeam(); track p.userId) {
+              <div class="player-row">
+                <div class="player-row__main">
+                  <app-player-badge class="player-row__badge" size="sm"
+                    [avatarUrl]="p.avatarUrl" [username]="p.username" [countryCode]="p.nationality"
+                    [name]="p.displayName" [userId]="p.userId" />
+                  @if (p.isCaptain) { <mat-icon class="player-row__captain">star</mat-icon> }
+                  @if (p.userId === motmUserId()) { <span class="player-row__motm">MOTM</span> }
+                  @if (p.overallRating !== null) {
+                    <span class="player-row__rating cb-mono">{{ p.overallRating.toFixed(1) }}</span>
+                  }
+                </div>
+                @if (p.goals > 0 || p.assists > 0 || p.ownGoals > 0) {
+                  <div class="player-row__stats">
+                    @if (p.goals > 0) { <span class="stat-badge">⚽ {{ p.goals }}</span> }
+                    @if (p.assists > 0) { <span class="stat-badge">🅰 {{ p.assists }}</span> }
+                    @if (p.ownGoals > 0) { <span class="stat-badge stat-badge--own">AG {{ p.ownGoals }}</span> }
+                  </div>
+                }
+                @if (p.comments.length > 0) {
+                  <ul class="player-row__comments">
+                    @for (c of p.comments; track $index) {
+                      <li><span class="player-row__comment-author">{{ c.reviewerDisplayName }}:</span> {{ c.comment }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (post()!.canInteract) {
+        <div class="post-card__actions">
+          <button mat-button (click)="toggleLike()">
+            <mat-icon [class.post-card__liked]="post()!.likedByMe">
+              {{ post()!.likedByMe ? 'favorite' : 'favorite_border' }}
+            </mat-icon>
+            {{ post()!.likeCount }}
+          </button>
+          <button mat-button>
+            <mat-icon>chat_bubble_outline</mat-icon>
+            {{ post()!.commentCount }}
+          </button>
+          <button mat-button (click)="share()">
+            <mat-icon>share</mat-icon>
+            {{ 'feed.share' | translate }}
+          </button>
+        </div>
+
+        <div class="comments">
+          <div class="comments__title">{{ 'feed.comments' | translate }}</div>
+
+          @if (comments().length === 0) {
+            <p class="comments__empty">{{ 'feed.noComments' | translate }}</p>
+          } @else {
+            <ul class="comments__list">
+              @for (c of comments(); track c.id) {
+                <li class="comment-item">
+                  <span class="comment-item__author">{{ c.authorDisplayName }}</span>
+                  <p class="comment-item__content">{{ c.content }}</p>
+                  <span class="comment-item__date">{{ c.createdAt | date:'d.M.yyyy HH:mm' }}</span>
+                </li>
+              }
+            </ul>
+          }
+
+          <div class="comments__input">
+            <input
+              [placeholder]="'feed.commentPlaceholder' | translate"
+              [value]="commentText()"
+              (input)="commentText.set($any($event.target).value)"
+              (keydown.enter)="submitComment()" />
+            <button mat-icon-button [disabled]="!commentText().trim() || submittingComment()" (click)="submitComment()">
+              <mat-icon>send</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
