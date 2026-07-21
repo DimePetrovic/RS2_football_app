@@ -1,0 +1,26 @@
+namespace Comeback.Social.Application.DTOs;
+
+public sealed record PostResponse(
+    Guid Id,
+    string Type,
+    Guid MatchId,
+    string MatchTitle,
+    int HomeScore,
+    int AwayScore,
+    string? Location,
+    DateTime? PlayedAt,
+    string? HomeTeamName,
+    string? AwayTeamName,
+    DateTime CreatedAt,
+    int LikeCount,
+    bool LikedByMe,
+    int CommentCount,
+    bool CanInteract,
+    Guid? OrganizerUserId,
+    string? OrganizerDisplayName,
+    string? OrganizerUsername,
+    string? OrganizerAvatarUrl,
+    string? OrganizerNationality,
+    string? Position,
+    bool ViewerAlreadyIn,
+    IReadOnlyList<PostPlayerDto> Players);

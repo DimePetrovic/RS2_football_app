@@ -28,6 +28,41 @@
     "logout": "Odjavi se",
     "search": "Pretraga"
   },
+  "feed": {
+    "title": "Feed",
+    "empty": "Trenutno nema objava za prikaz.",
+    "loadError": "Greška pri učitavanju feed-a.",
+    "loadMore": "Učitaj još",
+    "share": "Deli",
+    "homeTeam": "Domaći",
+    "awayTeam": "Gosti",
+    "fullTime": "Kraj",
+    "comments": "Komentari",
+    "noComments": "Još nema komentara.",
+    "commentPlaceholder": "Napiši komentar...",
+    "viewMatch": "Pregledaj meč",
+    "wanted": {
+      "banner": "Traži se",
+      "anyPlayer": "Sve pozicije",
+      "forMatch": "za meč",
+      "message": "Poruka",
+      "positions": {
+        "Goalkeeper": "Golman",
+        "Defender": "Odbrambeni",
+        "Midfielder": "Vezni",
+        "Forward": "Napadač"
+      },
+      "apply": "Prijavi se",
+      "appliedShort": "Prijavljen",
+      "applied": "Prijavljen si na meč!",
+      "withdrawDialog": {
+        "title": "Odjavi učešće",
+        "message": "Da li želiš da odjaviš učešće sa ovog fudbala?",
+        "confirm": "Odjavi se"
+      },
+      "withdrawn": "Odjavljen si sa meča."
+    }
+  },
   "chat": {
     "title": "Poruke",
     "noConversations": "Nemaš nijedan aktivan razgovor. Započni čet sa nekim igračem.",
