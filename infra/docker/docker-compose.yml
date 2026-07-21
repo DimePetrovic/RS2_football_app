@@ -1,4 +1,7 @@
 services:
+
+  # ── Baze podataka ────────────────────────────────────────────
+
   postgres-auth:
     image: postgres:16-alpine
     environment:
@@ -31,6 +34,24 @@ services:
       - comeback-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U comeback -d comeback_profile"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-rating:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: comeback_rating
+      POSTGRES_USER: comeback
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-comeback_dev}
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-rating-data:/var/lib/postgresql/data
+    networks:
+      - comeback-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U comeback -d comeback_rating"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -146,6 +167,16 @@ services:
 
   # ── Email (dev) ──────────────────────────────────────────────
 
+  maildev:
+    image: maildev/maildev:latest
+    ports:
+      - "1025:1025"
+      - "1080:1080"
+    networks:
+      - comeback-network
+
+  # ── Observability ────────────────────────────────────────────
+
   seq:
     image: datalust/seq:latest
     environment:
@@ -255,6 +286,35 @@ services:
       - "5210:8080"
     depends_on:
       postgres-profile:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - comeback-network
+    restart: on-failure
+
+  rating-api:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: rating
+        SERVICE_NAME: Rating
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__DefaultConnection: "Host=postgres-rating;Port=5432;Database=comeback_rating;Username=comeback;Password=${POSTGRES_PASSWORD:-comeback_dev}"
+      JwtSettings__Secret: ${JWT_SECRET:-dev-secret-min-32-chars-comeback-auth-2026}
+      JwtSettings__Issuer: comeback-auth
+      JwtSettings__Audience: comeback-api
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: comeback
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-comeback_dev}
+      Seq__ServerUrl: http://seq:5341
+    ports:
+      - "5310:8080"
+    depends_on:
+      postgres-rating:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -405,6 +465,7 @@ volumes:
   postgres-chat-data:
   postgres-auth-data:
   postgres-profile-data:
+  postgres-rating-data:
   postgres-match-data:
   postgres-notification-data:
   postgres-social-data:
