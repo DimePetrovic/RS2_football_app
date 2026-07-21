@@ -622,5 +622,10 @@
     "abbrLosses": "I",
     "goals": "Golovi",
     "assists": "Asistencije"
+  },
+  "search": {
+    "title": "Pretraga",
+    "placeholder": "Pretraži igrače po imenu ili @username",
+    "hint": "Ukucaj bar 2 slova da pronađeš igrača."
   }
 }

@@ -1,0 +1,48 @@
+<div class="search-page">
+  <h2 class="search-page__title">{{ 'search.title' | translate }}</h2>
+
+  <mat-form-field appearance="outline" class="search-page__field">
+    <mat-icon matPrefix>search</mat-icon>
+    <input
+      matInput
+      [formControl]="query"
+      [placeholder]="'search.placeholder' | translate"
+      autocomplete="off"
+    />
+  </mat-form-field>
+
+  @if (view(); as v) {
+    @switch (v.status) {
+      @case ('idle') {
+        <div class="search-page__hint">
+          <mat-icon>person_search</mat-icon>
+          <p>{{ 'search.hint' | translate }}</p>
+        </div>
+      }
+      @case ('loading') {
+        <div class="search-page__loading"><mat-spinner diameter="32" /></div>
+      }
+      @case ('empty') {
+        <div class="search-page__hint">
+          <mat-icon>search_off</mat-icon>
+          <p>{{ 'common.noResults' | translate }}</p>
+        </div>
+      }
+      @case ('results') {
+        <ul class="search-results">
+          @for (p of v.results; track p.userId) {
+            <li class="search-results__item">
+              <app-player-badge
+                [userId]="p.userId"
+                [avatarUrl]="p.avatarUrl"
+                [username]="p.username"
+                [name]="p.firstName + ' ' + p.lastName"
+                [countryCode]="p.nationality"
+              />
+            </li>
+          }
+        </ul>
+      }
+    }
+  }
+</div>
