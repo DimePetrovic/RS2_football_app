@@ -1,0 +1,41 @@
+name: docs
+
+# Generates the Doxygen API documentation for the backend and uploads it as a
+# build artifact (GitHub Pages is unavailable for private repos on the free
+# plan — if the repo ever goes public, swap the upload step for a Pages deploy).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "Doxyfile"
+      - "scripts/doxygen-csharp-filter.py"
+      - ".github/workflows/docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Doxygen
+        run: sudo apt-get update && sudo apt-get install -y doxygen
+
+      - name: Generate documentation
+        run: doxygen
+
+      - name: Show warnings
+        if: always()
+        run: cat docs/api/doxygen-warnings.log || true
+
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-docs
+          path: docs/api/html
+          retention-days: 30
