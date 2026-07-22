@@ -1,0 +1,43 @@
+<div class="notifications-page">
+  <div class="notifications-page__header">
+    <h2 class="notifications-page__title">{{ t('notifications.title') }}</h2>
+    @if (hasUnread()) {
+      <button mat-button color="primary" (click)="markAllRead()">
+        {{ t('notifications.markAllRead') }}
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="notifications-page__loading">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else if (error()) {
+    <div class="notifications-page__error">
+      <p>{{ t('notifications.loadError') }}</p>
+      <button mat-button (click)="load()">{{ t('notifications.retry') }}</button>
+    </div>
+  } @else if (notifications().length === 0) {
+    <div class="notifications-page__empty">
+      <mat-icon>notifications_none</mat-icon>
+      <p>{{ t('notifications.empty') }}</p>
+    </div>
+  } @else {
+    <ul class="notification-list">
+      @for (n of notifications(); track n.id) {
+        <li
+          class="notification-item"
+          [class.notification-item--unread]="!n.isRead"
+          (click)="markRead(n)"
+        >
+          <div class="notification-item__dot" [class.notification-item__dot--visible]="!n.isRead"></div>
+          <div class="notification-item__content">
+            <p class="notification-item__title">{{ n.title }}</p>
+            <p class="notification-item__body">{{ n.body }}</p>
+            <p class="notification-item__time">{{ n.createdAt | date:'d. MMM, HH:mm' }}</p>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</div>
