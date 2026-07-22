@@ -623,6 +623,77 @@
     "goals": "Golovi",
     "assists": "Asistencije"
   },
+  "notifications": {
+    "title": "Obaveštenja",
+    "markAllRead": "Označi sve kao pročitano",
+    "loadError": "Greška pri učitavanju obaveštenja.",
+    "retry": "Pokušaj ponovo",
+    "empty": "Nema obaveštenja.",
+    "types": {
+      "MatchInvitation": {
+        "title": "Poziv na meč",
+        "body": "{{organizerName}} te poziva na meč na {{location}} {{date}}.",
+        "bodyNoLocation": "{{organizerName}} te poziva na meč {{date}}."
+      },
+      "MatchInvitationAccepted": {
+        "title": "Igrač prihvatio poziv",
+        "body": "{{responderName}} je prihvatio/la poziv za meč „{{matchTitle}}“."
+      },
+      "MatchInvitationDeclined": {
+        "title": "Igrač odbio poziv",
+        "body": "{{responderName}} je odbio/la poziv za meč „{{matchTitle}}“."
+      },
+      "GroupMatchInvite": {
+        "title": "Poziv za meč grupa protiv grupe",
+        "body": "{{organizerName}} ({{organizerGroupName}}) poziva tvoju grupu na meč „{{matchTitle}}“ na {{location}} {{date}}.",
+        "bodyNoLocation": "{{organizerName}} ({{organizerGroupName}}) poziva tvoju grupu na meč „{{matchTitle}}“ {{date}}."
+      },
+      "GroupMatchInviteAccepted": {
+        "title": "Grupa prihvatila poziv",
+        "body": "Grupa „{{opponentGroupName}}“ je prihvatila poziv za meč „{{matchTitle}}“."
+      },
+      "GroupMatchInviteDeclined": {
+        "title": "Grupa odbila poziv",
+        "body": "Grupa „{{opponentGroupName}}“ je odbila poziv za meč „{{matchTitle}}“."
+      },
+      "MatchCancelled": {
+        "title": "Meč otkazan",
+        "body": "Meč „{{matchTitle}}“ je otkazan."
+      },
+      "MatchDetailsUpdated": {
+        "title": "Detalji meča izmenjeni",
+        "body": "Organizator je izmenio detalje meča „{{matchTitle}}“."
+      },
+      "MatchParticipantWithdrawn": {
+        "title": "Igrač odustao od meča",
+        "body": "{{playerName}} je odustao/la od meča „{{matchTitle}}“."
+      },
+      "MatchResultSubmitted": {
+        "title": "Meč je završen, oceni igrače",
+        "body": "Meč „{{matchTitle}}“ je završen ({{score}}). Oceni igrače koji su učestvovali."
+      },
+      "MatchResultReminder": {
+        "title": "Unesi rezultat meča",
+        "body": "Meč „{{matchTitle}}“ je završen — ne zaboravi da uneseš rezultat."
+      },
+      "MatchResultOverdue": {
+        "title": "Kasni unos rezultata",
+        "body": "Rezultat meča „{{matchTitle}}“ još nije unet. Unesi ga da meč ne bi bio propušten."
+      },
+      "MatchMissed": {
+        "title": "Meč propušten",
+        "body": "Meč „{{matchTitle}}“ je označen kao propušten jer rezultat nikad nije unet."
+      },
+      "PlayerWanted": {
+        "title": "Traži se {{subject}}",
+        "body": "{{organizerName}} je objavio javni poziv za meč „{{matchTitle}}“."
+      },
+      "PlayerJoinedViaPublicCall": {
+        "title": "Novi igrač na meču",
+        "body": "{{playerName}} se prijavio/la na meč „{{matchTitle}}“ preko javnog poziva."
+      }
+    }
+  },
   "search": {
     "title": "Pretraga",
     "placeholder": "Pretraži igrače po imenu ili @username",
