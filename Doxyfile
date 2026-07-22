@@ -1,0 +1,62 @@
+# Doxygen configuration for the Comeback backend (.NET microservices).
+# Generate with:  doxygen  (from the repo root) — output lands in docs/api/html.
+
+# ── Project ──────────────────────────────────────────────────────
+PROJECT_NAME           = "Comeback Backend"
+PROJECT_BRIEF          = "Recreational football platform — .NET microservices"
+OUTPUT_DIRECTORY       = docs/api
+OUTPUT_LANGUAGE        = English
+
+# ── Input ────────────────────────────────────────────────────────
+INPUT                  = src
+RECURSIVE              = YES
+FILE_PATTERNS          = *.cs
+EXCLUDE_PATTERNS       = */obj/* \
+                         */bin/* \
+                         */Migrations/*
+
+# Positional records (record X(...) : Base;) crash Doxygen's C# parser and get
+# dropped; the filter rewrites them to class syntax on the fly (code untouched).
+FILTER_PATTERNS        = *.cs="python scripts/doxygen-csharp-filter.py"
+
+# ── Extraction ───────────────────────────────────────────────────
+# Document everything, including members without /// comments — the structure
+# itself (namespaces, classes, signatures) is valuable for onboarding.
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+HIDE_UNDOC_MEMBERS     = NO
+INTERNAL_DOCS          = YES
+
+# C# XML doc comments (/// <summary> …) are parsed natively.
+JAVADOC_AUTOBRIEF      = YES
+QT_AUTOBRIEF           = YES
+MARKDOWN_SUPPORT       = YES
+
+# ── Grouping / navigation ────────────────────────────────────────
+# Services live in separate namespaces (Comeback.Match, Comeback.Chat, …),
+# so the namespace tree doubles as a per-service index.
+SHOW_NAMESPACES        = YES
+SORT_MEMBER_DOCS       = YES
+GENERATE_TREEVIEW      = YES
+FULL_SIDEBAR           = NO
+
+# ── Output ───────────────────────────────────────────────────────
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+HTML_COLORSTYLE        = TOGGLE
+GENERATE_LATEX         = NO
+GENERATE_MAN           = NO
+GENERATE_RTF           = NO
+GENERATE_XML           = NO
+
+# ── Diagrams ─────────────────────────────────────────────────────
+# Graphviz (dot) is not assumed on dev machines; built-in diagrams only.
+HAVE_DOT               = NO
+CLASS_GRAPH            = YES
+
+# ── Warnings ─────────────────────────────────────────────────────
+QUIET                  = YES
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = NO
+WARN_LOGFILE           = docs/api/doxygen-warnings.log
