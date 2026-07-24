@@ -1,0 +1,13 @@
+# ── Build Angular (production) ───────────────────────────────
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY web/comeback-web/package*.json ./
+RUN npm ci
+COPY web/comeback-web/ ./
+RUN npm run build -- --configuration production
+
+# ── Caddy: servira SPA + reverse proxy + automatski HTTPS ────
+FROM caddy:2-alpine AS runtime
+COPY infra/docker/Caddyfile /etc/caddy/Caddyfile
+# Angular 19 (application builder) izlaz je u dist/comeback-web/browser
+COPY --from=build /app/dist/comeback-web/browser /srv

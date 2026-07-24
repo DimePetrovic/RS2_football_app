@@ -8,6 +8,7 @@ public sealed class SmtpSettings
     public int Port { get; init; } = 1025;
     public string? Username { get; init; }
     public string? Password { get; init; }
+    public bool EnableSsl { get; init; }
     public string FromEmail { get; init; } = "noreply@comeback.app";
     public string FromName { get; init; } = "Comeback";
 }

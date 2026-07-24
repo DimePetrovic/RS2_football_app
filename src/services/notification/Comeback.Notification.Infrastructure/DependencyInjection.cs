@@ -39,7 +39,7 @@ public static class DependencyInjection
                 Credentials = smtp.Username is not null
                     ? new NetworkCredential(smtp.Username, smtp.Password)
                     : null,
-                EnableSsl = false,
+                EnableSsl = smtp.EnableSsl,
             });
 
         services.AddScoped<IEmailSender, FluentEmailSender>();

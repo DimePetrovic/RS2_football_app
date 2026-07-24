@@ -85,6 +85,9 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
+    app.MapGet("/health", () => Results.Ok(new { service = "profile", status = "healthy" }))
+        .WithTags("Health");
+
     app.MapProfileEndpoints();
     app.MapGroupEndpoints();
 
