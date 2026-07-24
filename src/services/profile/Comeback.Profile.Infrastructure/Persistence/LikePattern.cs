@@ -2,7 +2,7 @@ namespace Comeback.Profile.Infrastructure.Persistence;
 
 /// <summary>
 /// Builds LIKE/ILIKE patterns from user input while escaping the wildcard metacharacters
-/// (<c>%</c>, <c>_</c>) and the escape character (<c>\</c>) itself, so a search term is matched
+/// (<c>%</c> and <c>_</c>) and the backslash escape character itself, so a search term is matched
 /// literally instead of being interpreted as a wildcard. Use together with the escape-character
 /// overload of <c>EF.Functions.ILike(column, pattern, LikePattern.EscapeChar)</c>.
 /// </summary>
