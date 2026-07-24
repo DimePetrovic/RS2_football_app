@@ -1,10 +1,15 @@
-namespace Comeback.Profile.Infrastructure.Messaging;
+namespace Comeback.BuildingBlocks.Infrastructure.Messaging;
 
 using Comeback.BuildingBlocks.Application.Messaging;
 using Comeback.BuildingBlocks.Domain.Events;
 using MassTransit;
 
-internal sealed class MassTransitIntegrationEventPublisher : IIntegrationEventPublisher
+/// <summary>
+/// Shared <see cref="IIntegrationEventPublisher"/> implementation over MassTransit's
+/// <see cref="IPublishEndpoint"/>. Lives in BuildingBlocks so every service registers the same
+/// publisher instead of each carrying an identical copy.
+/// </summary>
+public sealed class MassTransitIntegrationEventPublisher : IIntegrationEventPublisher
 {
     private readonly IPublishEndpoint _publishEndpoint;
 

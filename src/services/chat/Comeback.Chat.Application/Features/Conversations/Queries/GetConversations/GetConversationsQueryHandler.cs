@@ -1,4 +1,5 @@
 namespace Comeback.Chat.Application.Features.Conversations.Queries.GetConversations;
+using Comeback.BuildingBlocks.Application.Clients;
 using Comeback.Chat.Application.Common.Interfaces;
 using Comeback.Chat.Application.DTOs;
 using Comeback.Chat.Domain.Enums;
@@ -35,7 +36,9 @@ public sealed class GetConversationsQueryHandler : IRequestHandler<GetConversati
 
         return conversations.Select(c => c with
         {
-            LastMessagePreview = c.LastMessagePreview != null ? _encryption.Decrypt(c.LastMessagePreview) : null,
+            LastMessagePreview = c.LastMessagePreview != null
+                ? (_encryption.TryDecrypt(c.LastMessagePreview, out var preview) ? preview : "[poruka nedostupna]")
+                : null,
             AvatarUrl = c.Type == ConversationType.Direct && c.OtherUserId is { } uid
                 ? avatarByUser.GetValueOrDefault(uid)
                 : c.AvatarUrl,

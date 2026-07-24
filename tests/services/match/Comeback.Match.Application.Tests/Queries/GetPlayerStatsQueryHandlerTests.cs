@@ -1,5 +1,6 @@
 namespace Comeback.Match.Application.Tests.Queries;
 
+using Comeback.BuildingBlocks.Application.Clients;
 using Comeback.Match.Application.Common.Interfaces;
 using Comeback.Match.Application.Features.Matches.Queries.GetPlayerStats;
 using Comeback.Match.Application.Tests.TestSupport;

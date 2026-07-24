@@ -1,5 +1,7 @@
 namespace Comeback.Chat.Infrastructure;
 
+using Comeback.BuildingBlocks.Application.Clients;
+using Comeback.BuildingBlocks.Infrastructure.Http;
 using Comeback.Chat.Application.Common.Interfaces;
 using Comeback.Chat.Infrastructure.Encryption;
 using Comeback.Chat.Infrastructure.Http;

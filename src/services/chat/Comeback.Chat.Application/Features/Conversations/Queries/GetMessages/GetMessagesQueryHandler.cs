@@ -1,4 +1,5 @@
 namespace Comeback.Chat.Application.Features.Conversations.Queries.GetMessages;
+using Comeback.BuildingBlocks.Application.Clients;
 using Comeback.BuildingBlocks.Domain.Exceptions;
 using Comeback.Chat.Application.Common.Interfaces;
 using Comeback.Chat.Application.DTOs;
@@ -44,10 +45,11 @@ public sealed class GetMessagesQueryHandler : IRequestHandler<GetMessagesQuery, 
         {
             senderInfos.TryGetValue(m.SenderUserId, out var info);
             var senderDisplayName = string.IsNullOrWhiteSpace(info?.DisplayName) ? m.SenderDisplayName : info!.DisplayName!;
+            var content = _encryption.TryDecrypt(m.EncryptedContent, out var text) ? text : "[poruka nedostupna]";
             return new MessageDto(
                 m.Id, m.ConversationId, m.SenderUserId, senderDisplayName,
                 info?.Username, info?.AvatarUrl, info?.Nationality,
-                _encryption.Decrypt(m.EncryptedContent), m.SentAt,
+                content, m.SentAt,
                 m.SenderUserId == query.UserId && otherReadAt.HasValue && m.SentAt <= otherReadAt.Value);
         }).ToList();
     }

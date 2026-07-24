@@ -1,43 +1,20 @@
 namespace Comeback.Notification.Infrastructure.Messaging;
 
-using System.Text.Json;
 using Comeback.BuildingBlocks.IntegrationEvents.Match;
 using Comeback.Notification.Application.Common.Interfaces;
-using Comeback.Notification.Application.Entities;
-using MassTransit;
 
-public sealed class MatchCancelledConsumer : IConsumer<MatchCancelledIntegrationEvent>
+public sealed class MatchCancelledConsumer : FanOutNotificationConsumer<MatchCancelledIntegrationEvent>
 {
-    private readonly IInAppNotificationRepository _repository;
-    private readonly INotificationUnitOfWork _unitOfWork;
-    private readonly INotificationPusher _pusher;
-
     public MatchCancelledConsumer(
         IInAppNotificationRepository repository,
         INotificationUnitOfWork unitOfWork,
-        INotificationPusher pusher)
-    {
-        _repository = repository;
-        _unitOfWork = unitOfWork;
-        _pusher = pusher;
-    }
+        INotificationPusher pusher) : base(repository, unitOfWork, pusher) { }
 
-    public async Task Consume(ConsumeContext<MatchCancelledIntegrationEvent> context)
-    {
-        var e = context.Message;
-        var payload = JsonSerializer.Serialize(new { matchId = e.MatchId, matchTitle = e.MatchTitle });
+    protected override string GetNotificationType(MatchCancelledIntegrationEvent e) => "MatchCancelled";
 
-        var notifications = e.NotifyUserIds.Select(userId => new InAppNotification(
-            recipientUserId: userId,
-            type: "MatchCancelled",
-            payload: payload)).ToList();
+    protected override object BuildPayload(MatchCancelledIntegrationEvent e)
+        => new { matchId = e.MatchId, matchTitle = e.MatchTitle };
 
-        foreach (var notification in notifications)
-            _repository.Add(notification);
-
-        await _unitOfWork.SaveChangesAsync(context.CancellationToken);
-
-        foreach (var notification in notifications)
-            await _pusher.PushAsync(notification, context.CancellationToken);
-    }
+    protected override Task<IReadOnlyCollection<Guid>> GetRecipientsAsync(
+        MatchCancelledIntegrationEvent e, CancellationToken ct) => To(e.NotifyUserIds);
 }

@@ -1,5 +1,6 @@
 namespace Comeback.Match.Application.Features.Matches.Queries.GetPlayerReceivedReviews;
 
+using Comeback.BuildingBlocks.Application.Clients;
 using Comeback.Match.Application.Common.Interfaces;
 using Comeback.Match.Application.DTOs;
 using MediatR;

@@ -1,5 +1,6 @@
 namespace Comeback.Match.Api.IntegrationTests;
 
+using Comeback.BuildingBlocks.Application.Clients;
 using Comeback.BuildingBlocks.Domain.Events;
 using Comeback.Match.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Hosting;

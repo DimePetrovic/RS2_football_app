@@ -1,37 +1,20 @@
 namespace Comeback.Notification.Infrastructure.Messaging;
 
-using System.Text.Json;
 using Comeback.BuildingBlocks.IntegrationEvents.Match;
 using Comeback.Notification.Application.Common.Interfaces;
-using Comeback.Notification.Application.Entities;
-using MassTransit;
 
-public sealed class MatchResultReminderConsumer : IConsumer<MatchResultReminderIntegrationEvent>
+public sealed class MatchResultReminderConsumer : FanOutNotificationConsumer<MatchResultReminderIntegrationEvent>
 {
-    private readonly IInAppNotificationRepository _repository;
-    private readonly INotificationUnitOfWork _unitOfWork;
-    private readonly INotificationPusher _pusher;
-
     public MatchResultReminderConsumer(
         IInAppNotificationRepository repository,
         INotificationUnitOfWork unitOfWork,
-        INotificationPusher pusher)
-    {
-        _repository = repository;
-        _unitOfWork = unitOfWork;
-        _pusher = pusher;
-    }
+        INotificationPusher pusher) : base(repository, unitOfWork, pusher) { }
 
-    public async Task Consume(ConsumeContext<MatchResultReminderIntegrationEvent> context)
-    {
-        var e = context.Message;
-        var notification = new InAppNotification(
-            recipientUserId: e.OrganizerUserId,
-            type: "MatchResultReminder",
-            payload: JsonSerializer.Serialize(new { matchId = e.MatchId, matchTitle = e.MatchTitle }));
+    protected override string GetNotificationType(MatchResultReminderIntegrationEvent e) => "MatchResultReminder";
 
-        _repository.Add(notification);
-        await _unitOfWork.SaveChangesAsync(context.CancellationToken);
-        await _pusher.PushAsync(notification, context.CancellationToken);
-    }
+    protected override object BuildPayload(MatchResultReminderIntegrationEvent e)
+        => new { matchId = e.MatchId, matchTitle = e.MatchTitle };
+
+    protected override Task<IReadOnlyCollection<Guid>> GetRecipientsAsync(
+        MatchResultReminderIntegrationEvent e, CancellationToken ct) => To(e.OrganizerUserId);
 }

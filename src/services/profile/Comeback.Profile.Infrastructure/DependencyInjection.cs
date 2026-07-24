@@ -2,6 +2,7 @@ namespace Comeback.Profile.Infrastructure;
 
 using Comeback.BuildingBlocks.Application.Messaging;
 using Comeback.BuildingBlocks.Infrastructure.Media;
+using Comeback.BuildingBlocks.Infrastructure.Messaging;
 using Comeback.Profile.Application.Common.Interfaces;
 using Comeback.Profile.Infrastructure.Messaging;
 using Comeback.Profile.Infrastructure.Persistence;
