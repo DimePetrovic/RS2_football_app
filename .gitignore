@@ -91,9 +91,8 @@ yarn-error.log*
 
 .env
 .env.*
-# Primer fajlovi se commituju — sadrže ključeve bez vrednosti
+# Primer fajl se commituje — sadrži ključeve bez vrednosti
 !.env.example
-!.env.prod.example
 
 # ============================================================
 # Docker — lokalne varijante
