@@ -43,20 +43,82 @@ docker compose up -d --build
   radi ručno.
 - **Admin nalog se automatski kreira** (vidi sekciju 5).
 
-### (Opciono) Cloudinary za upload slika
+Ostale tajne (lozinke baza, JWT) imaju dev-podrazumevane vrednosti u
+`docker-compose.yml`, pa ih ne moraš dirati. Jedini eksterni servis je
+**Cloudinary** (skladištenje medija) — vidi sekciju 2b.
 
-Upload profilnih/meč slika koristi Cloudinary. Bez njega aplikacija radi, ali
-upload slike neće raditi. Da ga uključiš:
+## 2b. Cloudinary — skladištenje medija (za testiranje uploada)
+
+**Svi mediji (slike i video) u aplikaciji čuvaju se na Cloudinary-ju.** Backend
+generiše potpisani zahtev, a fajl se sa frontenda šalje direktno na Cloudinary;
+u bazi se čuva samo URL. Zbog toga za testiranje uploada treba **Cloudinary
+nalog** (besplatan je dovoljan).
+
+> Aplikacija se pokreće i radi i **bez** Cloudinary-ja — ne pada. Samo funkcije
+> ispod neće moći da otpreme sliku dok ne uneseš kredencijale.
+
+### Funkcije koje zahtevaju Cloudinary nalog
+
+| Funkcija | Gde u aplikaciji | Šta se otprema |
+|---|---|---|
+| **Slika profila (avatar)** | Profil → *Izmeni profil* → upload avatara | Slika profila korisnika |
+| **Slika grupe** | Grupe → *Napravi grupu* / *Izmeni grupu* → upload slike | Avatar grupe (isti mehanizam kao profilni) |
+| **Galerija meča** | Meč → *Mediji* → dodaj slike/video | Foto/video galerija meča (batch upload) |
+
+Sve ostalo (registracija, login, profili, nacionalnosti, mečevi bez medija,
+feed, chat, notifikacije, rating) radi i bez Cloudinary-ja.
+
+### Korak 1 — Napravi besplatan nalog
+
+1. Idi na **https://cloudinary.com/users/register_free**.
+2. Registruj se (email + lozinka, ili Google/GitHub) i **potvrdi email**.
+3. Uloguj se — otvoriće se **Console / Dashboard**.
+
+### Korak 2 — Nađi 3 podatka (kredencijale)
+
+Na **Dashboard**-u (početna strana konzole), u kartici
+**"Product Environment Credentials"** (u novijoj konzoli: **Settings ⚙️ → API Keys**)
+nalaze se tačno tri vrednosti:
+
+| Podatak | Kako izgleda | Napomena |
+|---|---|---|
+| **Cloud name** | npr. `dxy12abcd` | jedinstveno ime tvog "clouda" |
+| **API Key** | niz cifara, npr. `123456789012345` | javni ključ |
+| **API Secret** | dugačak string | **TAJNA** — klikni *Reveal* / 👁 da ga vidiš; ne deli javno |
+
+### Korak 3 — Upiši ih lokalno
 
 ```bash
 cd infra/docker
 cp .env.example .env
-# otvori .env i popuni CLOUDINARY_CLOUD_NAME / API_KEY / API_SECRET
-docker compose up -d
 ```
 
-Ostale tajne (lozinke baza, JWT) imaju dev-podrazumevane vrednosti u
-`docker-compose.yml`, pa ih ne moraš dirati.
+Otvori fajl **`infra/docker/.env`** i popuni (bez navodnika, tačno sa Dashboard-a):
+
+```dotenv
+CLOUDINARY_CLOUD_NAME=dxy12abcd
+CLOUDINARY_API_KEY=123456789012345
+CLOUDINARY_API_SECRET=tvoj_api_secret_odavde
+```
+
+`docker compose` automatski učitava `.env` iz `infra/docker/` foldera.
+
+### Korak 4 — Restartuj servise koji koriste medije
+
+Kredencijale čitaju **profile-api** (avatar/grupe) i **match-api** (galerija meča):
+
+```bash
+docker compose up -d profile-api match-api
+```
+
+Nakon toga upload radi. Otpremljene slike možeš videti i u Cloudinary konzoli
+pod **Media Library**.
+
+> **Za predaju/evaluaciju:** najlakše je napraviti **jedan namenski (throwaway)
+> besplatan nalog** samo za ovaj projekat i proslediti ta tri podatka uz projekat
+> (npr. u već popunjenom `.env`), da evaluatori ne moraju da prave svoj nalog.
+> Ako je repozitorijum javan, ne commituj `API Secret` u kod — prosledi `.env`
+> odvojeno.
 
 ### Provera da su servisi podignuti
 
@@ -138,6 +200,10 @@ Predlog redosleda za demo/proveru:
 
 > Za testiranje "uživo" funkcija (chat/notifikacije) otvori aplikaciju u dva
 > browsera / dva naloga paralelno.
+>
+> Funkcije sa **otpremanjem slika** — avatar profila (korak 3), slika grupe i
+> galerija meča — zahtevaju **Cloudinary nalog** (vidi sekciju 2b). Bez njega
+> ostatak scenarija radi normalno.
 
 ---
 

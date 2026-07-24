@@ -43,22 +43,31 @@ admin nalog** (`d7petrovic@gmail.com` / `Test!234`).
 
 > Kredencijali RabbitMQ / baze: `comeback` / `comeback_dev`
 
-### 2. Cloudinary (upload slika) — opciono
+### 2. Cloudinary (skladištenje medija) — opciono
 
-Upload profilnih i meč-slika ide preko Cloudinary-ja (frontend šalje fajl
-direktno, uz potpis sa backenda).
+**Svi mediji (slike/video) se čuvaju na Cloudinary-ju** — frontend šalje fajl
+direktno, uz potpis sa backenda; u bazi ostaje samo URL.
 
 **Aplikacija radi i bez Cloudinary-ja** — pokreće se normalno i sve funkcioniše
-osim uploada slika. Da uključiš upload, napravi (besplatan) Cloudinary nalog i
-popuni kredencijale:
+osim otpremanja medija. Funkcije koje traže Cloudinary nalog za testiranje:
+
+- **Slika profila (avatar)** — Profil → *Izmeni profil*
+- **Slika grupe** — Grupe → *Napravi / Izmeni grupu*
+- **Galerija meča** — Meč → *Mediji* (slike/video)
+
+Da uključiš upload, napravi besplatan Cloudinary nalog i popuni kredencijale:
 
 ```bash
 cd infra/docker
 cp .env.example .env
 # u .env popuni CLOUDINARY_CLOUD_NAME / API_KEY / API_SECRET
-docker compose up -d
+docker compose up -d profile-api match-api
 ```
 
+> **Detaljno uputstvo** (pravljenje naloga, gde se nalaze ta tri podatka, gde se
+> upisuju) je u [`docs/POKRETANJE-I-TESTIRANJE.md`](docs/POKRETANJE-I-TESTIRANJE.md),
+> sekcija **2b**.
+>
 > Za demo/evaluaciju najlakše je koristiti jedan namenski (throwaway) besplatan
 > nalog i podeliti njegove kredencijale uz projekat. Ako je repo javan, ne
 > commituj tajnu u kod — prosledi je uz `.env`.
