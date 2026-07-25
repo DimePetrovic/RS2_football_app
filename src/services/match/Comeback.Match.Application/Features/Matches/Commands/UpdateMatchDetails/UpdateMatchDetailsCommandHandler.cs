@@ -30,11 +30,24 @@ public sealed class UpdateMatchDetailsCommandHandler : IRequestHandler<UpdateMat
         var match = await _matches.GetByIdWithParticipantsAsync(cmd.MatchId, ct)
             ?? throw new NotFoundException("Match not found.", "match.not_found");
 
-        // The time changed -> cancel the old reminder and schedule a new one for the correct time.
-        _scheduler.CancelJob(match.ResultReminderJobId);
+        // Validate + apply the edit first; UpdateDetails enforces organizer/status rules and may throw,
+        // in which case we must not have already cancelled the existing reminder job.
+        var previousEndsAt = match.EndsAt;
         match.UpdateDetails(cmd.OrganizerUserId, cmd.Title, cmd.Location, cmd.StartsAt, cmd.DurationMinutes);
-        var jobId = _scheduler.ScheduleResultReminder(match.Id, match.EndsAt.AddMinutes(15));
-        match.SetResultReminderJobId(jobId);
+
+        // Only touch the scheduler when the match end time actually changed (a title/location edit leaves
+        // the reminder untouched). And never schedule a reminder in the past — editing an already-ended
+        // match must not fire an instant "enter the result" reminder.
+        if (match.EndsAt != previousEndsAt)
+        {
+            _scheduler.CancelJob(match.ResultReminderJobId);
+            var reminderAt = match.EndsAt.AddMinutes(15);
+            var jobId = reminderAt > DateTime.UtcNow
+                ? _scheduler.ScheduleResultReminder(match.Id, reminderAt)
+                : null;
+            match.SetResultReminderJobId(jobId);
+        }
+
         await _unitOfWork.SaveChangesAsync(ct);
 
         var notifyUserIds = match.Participants

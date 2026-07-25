@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Comeback.Profile.Application\Comeback.Profile.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Comeback.Profile.Application.Tests" />
+  </ItemGroup>
+
 </Project>

@@ -1,6 +1,7 @@
 namespace Comeback.Rating.Infrastructure;
 
 using Comeback.BuildingBlocks.Application.Messaging;
+using Comeback.BuildingBlocks.Infrastructure.Messaging;
 using Comeback.Rating.Application.Common.Interfaces;
 using Comeback.Rating.Infrastructure.Messaging;
 using Comeback.Rating.Infrastructure.Persistence;

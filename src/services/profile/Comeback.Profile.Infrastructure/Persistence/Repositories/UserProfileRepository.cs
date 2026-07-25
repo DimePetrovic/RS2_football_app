@@ -26,14 +26,15 @@ internal sealed class UserProfileRepository : IUserProfileRepository
     public Task<List<UserProfile>> SearchAsync(string query, Guid excludeUserId, int limit, CancellationToken cancellationToken = default)
     {
         // ILIKE koristi PostgreSQL indeks i pravilno hvata velika/mala slova (bez ToLower po redu).
-        var pattern = $"%{query}%";
+        // Escape-ujemo % i _ iz upita da se tretiraju kao literali, ne kao wildcard-i.
+        var pattern = LikePattern.Contains(query);
         return _context.Profiles
             .Where(p => p.UserId != excludeUserId
                      && p.Role != UserRoles.Admin
-                     && (EF.Functions.ILike(p.Username, pattern)
-                      || EF.Functions.ILike(p.FirstName, pattern)
-                      || EF.Functions.ILike(p.LastName, pattern)
-                      || EF.Functions.ILike(p.FirstName + " " + p.LastName, pattern)))
+                     && (EF.Functions.ILike(p.Username, pattern, LikePattern.EscapeChar)
+                      || EF.Functions.ILike(p.FirstName, pattern, LikePattern.EscapeChar)
+                      || EF.Functions.ILike(p.LastName, pattern, LikePattern.EscapeChar)
+                      || EF.Functions.ILike(p.FirstName + " " + p.LastName, pattern, LikePattern.EscapeChar)))
             .OrderBy(p => p.Username)
             .Take(limit)
             .ToListAsync(cancellationToken);

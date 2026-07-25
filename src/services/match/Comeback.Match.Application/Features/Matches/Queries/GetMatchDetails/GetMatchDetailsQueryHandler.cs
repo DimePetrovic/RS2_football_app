@@ -1,5 +1,6 @@
 namespace Comeback.Match.Application.Features.Matches.Queries.GetMatchDetails;
 
+using Comeback.BuildingBlocks.Application.Clients;
 using Comeback.BuildingBlocks.Domain.Exceptions;
 using Comeback.BuildingBlocks.IntegrationEvents.Match;
 using Comeback.Match.Application.Common.Interfaces;

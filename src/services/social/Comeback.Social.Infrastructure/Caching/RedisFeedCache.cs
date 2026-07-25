@@ -21,7 +21,7 @@ public sealed class RedisFeedCache : IFeedCache
             var db = _redis.GetDatabase();
             var value = await db.StringGetAsync(Key(userId));
             if (value.IsNullOrEmpty) return null;
-            return JsonSerializer.Deserialize<List<PostResponse>>(value!);
+            return JsonSerializer.Deserialize<List<PostResponse>>((string)value!);
         }
         catch
         {

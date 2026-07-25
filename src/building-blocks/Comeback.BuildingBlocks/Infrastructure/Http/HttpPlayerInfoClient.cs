@@ -1,9 +1,15 @@
-namespace Comeback.Chat.Infrastructure.Http;
+namespace Comeback.BuildingBlocks.Infrastructure.Http;
 
 using System.Net.Http.Json;
 using System.Text.Json;
-using Comeback.Chat.Application.Common.Interfaces;
+using Comeback.BuildingBlocks.Application.Clients;
 
+/// <summary>
+/// Shared <see cref="IPlayerInfoClient"/> over the Profile service's internal avatars endpoint.
+/// Register with <c>AddHttpClient&lt;IPlayerInfoClient, HttpPlayerInfoClient&gt;(...)</c> and set the
+/// client's <c>BaseAddress</c> to the Profile API. When the Profile service is unavailable the call
+/// degrades to an empty list so callers fall back to the display name without an avatar.
+/// </summary>
 public sealed class HttpPlayerInfoClient : IPlayerInfoClient
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
@@ -27,7 +33,7 @@ public sealed class HttpPlayerInfoClient : IPlayerInfoClient
         }
         catch
         {
-            // Profile service unavailable — the sender badge falls back to display name without an avatar.
+            // Profile service unavailable — degrade to the display name without an avatar.
             return [];
         }
     }

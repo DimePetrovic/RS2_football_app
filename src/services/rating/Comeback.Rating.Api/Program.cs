@@ -79,6 +79,9 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
+    app.MapGet("/health", () => Results.Ok(new { service = "rating", status = "healthy" }))
+        .WithTags("Health");
+
     app.MapRatingEndpoints();
 
     app.Run();

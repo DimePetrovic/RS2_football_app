@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\services\profile\Comeback.Profile.Application\Comeback.Profile.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\src\services\profile\Comeback.Profile.Infrastructure\Comeback.Profile.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

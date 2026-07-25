@@ -1,4 +1,5 @@
 namespace Comeback.Chat.Application.Features.Messages.Commands.Send;
+using Comeback.BuildingBlocks.Application.Clients;
 using Comeback.BuildingBlocks.Domain.Exceptions;
 using Comeback.Chat.Application.Common.Interfaces;
 using Comeback.Chat.Application.DTOs;
@@ -75,7 +76,9 @@ public sealed class SendMessageCommandHandler : IRequestHandler<SendMessageComma
         }
 
         var encrypted = _encryption.Encrypt(cmd.Content);
-        var message = Message.Create(cmd.ConversationId, cmd.SenderUserId, cmd.SenderDisplayName, encrypted);
+        // Persist the same resolved name we broadcast in the DTO below (for groups this is the live
+        // profile DisplayName), so the stored row and the pushed message never disagree.
+        var message = Message.Create(cmd.ConversationId, cmd.SenderUserId, senderDisplayName, encrypted);
 
         _repository.AddMessage(message);
         await _unitOfWork.SaveChangesAsync(ct);

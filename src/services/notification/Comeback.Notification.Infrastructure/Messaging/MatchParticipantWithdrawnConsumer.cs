@@ -1,44 +1,24 @@
 namespace Comeback.Notification.Infrastructure.Messaging;
 
-using System.Text.Json;
 using Comeback.BuildingBlocks.IntegrationEvents.Match;
 using Comeback.Notification.Application.Common.Interfaces;
-using Comeback.Notification.Application.Entities;
-using MassTransit;
 
-public sealed class MatchParticipantWithdrawnConsumer : IConsumer<MatchParticipantWithdrawnIntegrationEvent>
+public sealed class MatchParticipantWithdrawnConsumer : FanOutNotificationConsumer<MatchParticipantWithdrawnIntegrationEvent>
 {
-    private readonly IInAppNotificationRepository _repository;
-    private readonly INotificationUnitOfWork _unitOfWork;
-    private readonly INotificationPusher _pusher;
-
     public MatchParticipantWithdrawnConsumer(
         IInAppNotificationRepository repository,
         INotificationUnitOfWork unitOfWork,
-        INotificationPusher pusher)
+        INotificationPusher pusher) : base(repository, unitOfWork, pusher) { }
+
+    protected override string GetNotificationType(MatchParticipantWithdrawnIntegrationEvent e) => "MatchParticipantWithdrawn";
+
+    protected override object BuildPayload(MatchParticipantWithdrawnIntegrationEvent e) => new
     {
-        _repository = repository;
-        _unitOfWork = unitOfWork;
-        _pusher = pusher;
-    }
+        matchId = e.MatchId,
+        matchTitle = e.MatchTitle,
+        playerName = e.WithdrawnPlayerDisplayName,
+    };
 
-    public async Task Consume(ConsumeContext<MatchParticipantWithdrawnIntegrationEvent> context)
-    {
-        var e = context.Message;
-        var payload = JsonSerializer.Serialize(new
-        {
-            matchId = e.MatchId,
-            matchTitle = e.MatchTitle,
-            playerName = e.WithdrawnPlayerDisplayName,
-        });
-
-        var notification = new InAppNotification(
-            recipientUserId: e.OrganizerUserId,
-            type: "MatchParticipantWithdrawn",
-            payload: payload);
-
-        _repository.Add(notification);
-        await _unitOfWork.SaveChangesAsync(context.CancellationToken);
-        await _pusher.PushAsync(notification, context.CancellationToken);
-    }
+    protected override Task<IReadOnlyCollection<Guid>> GetRecipientsAsync(
+        MatchParticipantWithdrawnIntegrationEvent e, CancellationToken ct) => To(e.OrganizerUserId);
 }

@@ -27,10 +27,10 @@ internal sealed class PlayerGroupRepository : IPlayerGroupRepository
 
     public Task<List<PlayerGroup>> SearchByNameAsync(string query, int limit, CancellationToken cancellationToken = default)
     {
-        var pattern = $"%{query}%";
+        var pattern = LikePattern.Contains(query);
         return _context.Groups
             .Include(g => g.Members)
-            .Where(g => EF.Functions.ILike(g.Name, pattern))
+            .Where(g => EF.Functions.ILike(g.Name, pattern, LikePattern.EscapeChar))
             .OrderBy(g => g.Name)
             .Take(limit)
             .ToListAsync(cancellationToken);

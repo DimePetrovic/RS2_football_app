@@ -1,4 +1,5 @@
 namespace Comeback.Chat.Application.Features.Conversations.Queries.GetGroupMembers;
+using Comeback.BuildingBlocks.Application.Clients;
 using Comeback.BuildingBlocks.Domain.Exceptions;
 using Comeback.Chat.Application.Common.Interfaces;
 using Comeback.Chat.Application.DTOs;

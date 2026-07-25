@@ -19,4 +19,9 @@ internal sealed class PlayerXpRepository : IPlayerXpRepository
     public void Add(PlayerXp playerXp) => _context.PlayerXps.Add(playerXp);
 
     public void Update(PlayerXp playerXp) => _context.PlayerXps.Update(playerXp);
+
+    public Task<bool> HasAwardedMatchXpAsync(Guid matchId, Guid userId, CancellationToken cancellationToken = default)
+        => _context.AwardedMatchXps.AnyAsync(a => a.MatchId == matchId && a.UserId == userId, cancellationToken);
+
+    public void MarkMatchXpAwarded(AwardedMatchXp record) => _context.AwardedMatchXps.Add(record);
 }

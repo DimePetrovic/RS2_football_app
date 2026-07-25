@@ -27,7 +27,7 @@ internal sealed class MatchResultSubmittedConsumer : IConsumer<MatchResultSubmit
                 isCaptain: player.IsCaptain);
 
             await _sender.Send(
-                new AwardMatchXpCommand(player.UserId, xp),
+                new AwardMatchXpCommand(e.MatchId, player.UserId, xp),
                 context.CancellationToken);
         }
     }

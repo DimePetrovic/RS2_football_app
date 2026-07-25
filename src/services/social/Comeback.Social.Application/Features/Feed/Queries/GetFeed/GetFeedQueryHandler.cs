@@ -37,12 +37,12 @@ public sealed class GetFeedQueryHandler : IRequestHandler<GetFeedQuery, List<Pos
         var posts = await _posts.GetByIdsAsync(feedItems.Select(f => f.PostId), ct);
         var postsById = posts.ToDictionary(p => p.Id);
 
-        var result = new List<PostResponse>();
-        foreach (var feedItem in feedItems)
-        {
-            if (!postsById.TryGetValue(feedItem.PostId, out var post)) continue;
-            result.Add(await _enricher.EnrichAsync(post, query.UserId, ct));
-        }
+        // Enrich all posts concurrently; each EnrichAsync fans out to independent Match/Profile HTTP calls.
+        // Task.WhenAll preserves input order, so the feed keeps its original ordering.
+        var enrichTasks = feedItems
+            .Where(f => postsById.ContainsKey(f.PostId))
+            .Select(f => _enricher.EnrichAsync(postsById[f.PostId], query.UserId, ct));
+        var result = (await Task.WhenAll(enrichTasks)).ToList();
 
         if (query.Page == 0)
             await _cache.SetAsync(query.UserId, result, ct);
