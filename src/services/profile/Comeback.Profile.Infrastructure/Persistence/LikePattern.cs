@@ -8,7 +8,14 @@ namespace Comeback.Profile.Infrastructure.Persistence;
 /// </summary>
 internal static class LikePattern
 {
-    public const string EscapeChar = "\\";
+    /// <remarks>
+    /// Deliberately <c>static readonly</c> rather than <c>const</c>: a <c>const</c> is inlined into the
+    /// LINQ expression tree as a <c>ConstantExpression</c>, which EF Core renders as a SQL literal
+    /// (<c>ESCAPE '\'</c>) instead of a parameter. That literal only parses while the server has
+    /// <c>standard_conforming_strings</c> on, so parameterising it keeps the query independent of
+    /// per-session string-literal settings.
+    /// </remarks>
+    public static readonly string EscapeChar = "\\";
 
     public static string Escape(string input)
         => input
