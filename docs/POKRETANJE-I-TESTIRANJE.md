@@ -226,6 +226,43 @@ Pokriveni servisi:
 
 > Integracioni testovi koriste Testcontainers, pa Docker mora biti pokrenut.
 
+### End-to-end testovi
+
+Integracioni testovi podižu **jedan** servis u procesu i fejkuju messaging i pozive ka
+drugim servisima. E2e testovi rade suprotno — gađaju **podignut sistem** preko gateway-a
+i prolaze kroz prave RabbitMQ skokove između servisa.
+
+Zato **nisu deo `Comeback.sln`** i ne pokreću ih `dotnet test`; pokreću se namenski, nad
+stackom koji već radi:
+
+```bash
+# 1. podigni sistem (ako vec nije)
+cd infra/docker && docker compose up -d
+
+# 2. pokreni e2e
+cd ../..
+dotnet test tests/e2e/Comeback.E2ETests
+```
+
+Ako stack nije dostupan, testovi padaju sa porukom koja kaže šta da pokreneš.
+Adrese se po potrebi menjaju promenljivama `E2E_GATEWAY_URL` (podrazumevano
+`http://localhost:5000`) i `E2E_MAILDEV_URL` (`http://localhost:1080`).
+
+Pokriveni tokovi:
+
+| Test | Šta prolazi kroz sistem |
+|---|---|
+| Registracija → verifikacioni mejl → potvrda → prijava | gateway → auth → RabbitMQ → notification → SMTP → MailDev |
+| Potvrđena registracija pravi profil i on je pretraživ | auth → RabbitMQ → profile, pa `ILIKE` pretraga |
+| Token izdat od auth servisa važi i u drugim servisima | auth → gateway → profile / notification |
+| Gateway odbija neautentifikovane zahteve | gateway → profile / notification / match |
+
+> **Poznato ponašanje:** prvi verifikacioni mejl nakon što notification servis odstoji
+> propadne sa `SmtpException: Timeout - closing connection` i završi u redu
+> `notification-email-verification-requested_error`. Svaki sledeći prolazi normalno.
+> Fixture zato namerno „potroši" jednu registraciju pre testova
+> (`LiveStackFixture.WarmUpSmtpAsync`). Kad se propust popravi, taj warm-up treba obrisati.
+
 ---
 
 ## 8. Dokumentacija koda (Doxygen)
