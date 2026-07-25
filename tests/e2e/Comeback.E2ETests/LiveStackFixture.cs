@@ -34,32 +34,6 @@ public sealed class LiveStackFixture : IAsyncLifetime
         MailDev = new HttpClient { BaseAddress = new Uri(MailDevUrl), Timeout = TimeSpan.FromSeconds(30) };
 
         SkipReason = await ProbeAsync();
-        if (SkipReason is null) await WarmUpSmtpAsync();
-    }
-
-    /// <summary>
-    /// ZNANO PONASANJE SISTEMA: prvi verifikacioni mejl nakon sto notification servis odstoji
-    /// neko vreme uvek propadne. U logovima:
-    ///
-    ///   SmtpException: Service not available, closing transmission channel.
-    ///                  The server response was: Timeout - closing connection
-    ///   Declare queue: notification-email-verification-requested_error
-    ///
-    /// Poruka zavrsi u error redu i taj mejl se izgubi; svaki sledeci prolazi normalno.
-    /// Ovde se namerno "potrosi" ta prva registracija, da testovi mere ustaljeno ponasanje,
-    /// a ne taj poznati propust. Kad se propust popravi, ovaj warm-up treba obrisati.
-    /// </summary>
-    private async Task WarmUpSmtpAsync()
-    {
-        try
-        {
-            var (email, _, _) = await RegisterAsync();
-            await ReadVerificationLinkAsync(email, timeoutSeconds: 45);
-        }
-        catch (Exception)
-        {
-            // Ocekivano — bas taj propali mejl je razlog zbog kog warm-up postoji.
-        }
     }
 
     public Task DisposeAsync()

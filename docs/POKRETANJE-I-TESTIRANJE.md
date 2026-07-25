@@ -240,6 +240,16 @@ Podrazumevano otvara Chrome i ostaje u watch režimu. Za jednokratno pokretanje
 npx ng test --watch=false --browsers=ChromeHeadless
 ```
 
+Pokriveno je jezgro aplikacije — ono kroz šta prolazi svaki zahtev i svaka ruta:
+
+| Šta | Ključne provere |
+|---|---|
+| `authInterceptor` | dodaje token samo našem API-ju (**nikad trećoj strani**), osvežava ga na 401 i ponavlja zahtev, odjavljuje kad osvežavanje padne |
+| `errorInterceptor` | mapira `code` sa backenda u lokalizovanu poruku, pada nazad po HTTP statusu, ćuti na 401 / auth formama / izričitom izuzeću |
+| `auth.guard` | sva četiri čuvara (`auth`, `guest`, `admin`, `playerArea`) i njihova preusmerenja |
+| `TranslationService` | ugnježdeni ključevi, zamena parametara, i `translateFlat` za kodove koji sami sadrže tačke |
+| `AppComponent` | učitava prevode i primenjuje temu pri pokretanju |
+
 ### End-to-end testovi
 
 Integracioni testovi podižu **jedan** servis u procesu i fejkuju messaging i pozive ka
@@ -270,12 +280,6 @@ Pokriveni tokovi:
 | Potvrđena registracija pravi profil i on je pretraživ | auth → RabbitMQ → profile, pa `ILIKE` pretraga |
 | Token izdat od auth servisa važi i u drugim servisima | auth → gateway → profile / notification |
 | Gateway odbija neautentifikovane zahteve | gateway → profile / notification / match |
-
-> **Poznato ponašanje:** prvi verifikacioni mejl nakon što notification servis odstoji
-> propadne sa `SmtpException: Timeout - closing connection` i završi u redu
-> `notification-email-verification-requested_error`. Svaki sledeći prolazi normalno.
-> Fixture zato namerno „potroši" jednu registraciju pre testova
-> (`LiveStackFixture.WarmUpSmtpAsync`). Kad se propust popravi, taj warm-up treba obrisati.
 
 ---
 
