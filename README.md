@@ -94,6 +94,20 @@ Integracioni testovi koriste Testcontainers, pa Docker mora biti pokrenut.
 
 ---
 
+## Dokumentacija koda
+
+Backend je dokumentovan Doxygen komentarima. Generisanje (traži `doxygen` i
+`python` na PATH-u):
+
+```bash
+doxygen Doxyfile
+```
+
+Otvori zatim `docs/api/html/index.html`. Detalji su u
+[`docs/POKRETANJE-I-TESTIRANJE.md`](docs/POKRETANJE-I-TESTIRANJE.md), sekcija **8**.
+
+---
+
 ## Struktura projekta
 
 ```
