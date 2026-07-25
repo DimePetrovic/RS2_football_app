@@ -1,8 +1,15 @@
 @use '@angular/material' as mat;
 // SVG country flags — only the 4x3 variant (the 1x1 set collides with it in the
 // bundler because both use the same SVG file names).
+//
+// The path is root-absolute on purpose. A bare specifier ('flag-icons/flags') is resolved
+// differently by the two builders this project uses: the `application` builder (esbuild) treats
+// it as a package path and finds the SVGs, while the `karma` builder (webpack) resolves it
+// relative to the importing file inside node_modules/flag-icons/sass/ and fails — which broke
+// `ng test` outright. The flags are copied to /flag-icons/flags by an assets rule in
+// angular.json, so an absolute URL needs no bundler resolution at all and both agree.
 @use 'flag-icons/sass/flag-icons' with (
-  $flag-icons-path: 'flag-icons/flags',
+  $flag-icons-path: '/flag-icons/flags',
   $flag-icons-use-square: false
 );
 

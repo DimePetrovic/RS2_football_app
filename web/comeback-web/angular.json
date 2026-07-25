@@ -29,6 +29,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/flag-icons/flags",
+                "output": "flag-icons/flags"
               }
             ],
             "styles": [
@@ -88,6 +93,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/flag-icons/flags",
+                "output": "flag-icons/flags"
               }
             ],
             "styles": [
