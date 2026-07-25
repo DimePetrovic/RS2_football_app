@@ -22,6 +22,25 @@ namespace Comeback.Rating.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Comeback.Rating.Domain.Entities.AwardedMatchXp", b =>
+                {
+                    b.Property<Guid>("MatchId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("match_id");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<DateTime>("AwardedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("awarded_at");
+
+                    b.HasKey("MatchId", "UserId");
+
+                    b.ToTable("awarded_match_xp", (string)null);
+                });
+
             modelBuilder.Entity("Comeback.Rating.Domain.Entities.PlayerXp", b =>
                 {
                     b.Property<Guid>("Id")

@@ -1,5 +1,7 @@
 namespace Comeback.Match.Infrastructure;
 
+using Comeback.BuildingBlocks.Application.Clients;
+using Comeback.BuildingBlocks.Infrastructure.Http;
 using Comeback.BuildingBlocks.Infrastructure.Media;
 using Comeback.Match.Application.Common.Interfaces;
 using Comeback.Match.Infrastructure.Http;

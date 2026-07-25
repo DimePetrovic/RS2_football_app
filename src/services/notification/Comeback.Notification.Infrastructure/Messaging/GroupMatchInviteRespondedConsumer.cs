@@ -1,44 +1,25 @@
 namespace Comeback.Notification.Infrastructure.Messaging;
 
-using System.Text.Json;
 using Comeback.BuildingBlocks.IntegrationEvents.Match;
 using Comeback.Notification.Application.Common.Interfaces;
-using Comeback.Notification.Application.Entities;
-using MassTransit;
 
-public sealed class GroupMatchInviteRespondedConsumer : IConsumer<GroupMatchInviteRespondedIntegrationEvent>
+public sealed class GroupMatchInviteRespondedConsumer : FanOutNotificationConsumer<GroupMatchInviteRespondedIntegrationEvent>
 {
-    private readonly IInAppNotificationRepository _repository;
-    private readonly INotificationUnitOfWork _unitOfWork;
-    private readonly INotificationPusher _pusher;
-
     public GroupMatchInviteRespondedConsumer(
         IInAppNotificationRepository repository,
         INotificationUnitOfWork unitOfWork,
-        INotificationPusher pusher)
+        INotificationPusher pusher) : base(repository, unitOfWork, pusher) { }
+
+    protected override string GetNotificationType(GroupMatchInviteRespondedIntegrationEvent e)
+        => e.Accepted ? "GroupMatchInviteAccepted" : "GroupMatchInviteDeclined";
+
+    protected override object BuildPayload(GroupMatchInviteRespondedIntegrationEvent e) => new
     {
-        _repository = repository;
-        _unitOfWork = unitOfWork;
-        _pusher = pusher;
-    }
+        matchId = e.MatchId,
+        matchTitle = e.MatchTitle,
+        opponentGroupName = e.OpponentGroupName,
+    };
 
-    public async Task Consume(ConsumeContext<GroupMatchInviteRespondedIntegrationEvent> context)
-    {
-        var e = context.Message;
-        var payload = JsonSerializer.Serialize(new
-        {
-            matchId = e.MatchId,
-            matchTitle = e.MatchTitle,
-            opponentGroupName = e.OpponentGroupName,
-        });
-
-        var notification = new InAppNotification(
-            recipientUserId: e.OrganizerUserId,
-            type: e.Accepted ? "GroupMatchInviteAccepted" : "GroupMatchInviteDeclined",
-            payload: payload);
-
-        _repository.Add(notification);
-        await _unitOfWork.SaveChangesAsync(context.CancellationToken);
-        await _pusher.PushAsync(notification, context.CancellationToken);
-    }
+    protected override Task<IReadOnlyCollection<Guid>> GetRecipientsAsync(
+        GroupMatchInviteRespondedIntegrationEvent e, CancellationToken ct) => To(e.OrganizerUserId);
 }

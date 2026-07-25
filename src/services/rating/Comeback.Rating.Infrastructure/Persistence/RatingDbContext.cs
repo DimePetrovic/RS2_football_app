@@ -9,6 +9,7 @@ public sealed class RatingDbContext : DbContext, IUnitOfWork
     public RatingDbContext(DbContextOptions<RatingDbContext> options) : base(options) { }
 
     public DbSet<PlayerXp> PlayerXps => Set<PlayerXp>();
+    public DbSet<AwardedMatchXp> AwardedMatchXps => Set<AwardedMatchXp>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

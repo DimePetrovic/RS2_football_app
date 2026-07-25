@@ -20,15 +20,18 @@ public sealed class PostEnricher
     {
         if (post.Type == PostType.PlayerWanted)
         {
-            // The organizer is rendered as a badge — avatar + real name + username.
-            var organizer = (await _avatarsClient.GetPlayerInfosAsync([post.OrganizerUserId], ct))
-                .GetValueOrDefault(post.OrganizerUserId);
+            // The organizer badge and the live participation marker come from two independent
+            // services — fetch them concurrently.
+            var organizerTask = _avatarsClient.GetPlayerInfosAsync([post.OrganizerUserId], ct);
+            var detailsTask = _matchClient.GetMatchDetailsAsync(post.MatchId, ct);
+            await Task.WhenAll(organizerTask, detailsTask);
+
+            var organizer = (await organizerTask).GetValueOrDefault(post.OrganizerUserId);
             var organizerName = string.IsNullOrWhiteSpace(organizer?.DisplayName)
                 ? post.OrganizerDisplayName
                 : organizer!.DisplayName!;
 
-            // Live participation decides the "already applied" marker on the card.
-            var details = await _matchClient.GetMatchDetailsAsync(post.MatchId, ct);
+            var details = await detailsTask;
             var viewerAlreadyIn = currentUserId == post.OrganizerUserId
                 || details?.Participants.Any(p =>
                     p.UserId == currentUserId && p.Status is "Invited" or "Accepted") == true;
@@ -74,9 +77,14 @@ public sealed class PostEnricher
 
     private async Task<List<PostPlayerDto>> BuildPlayersAsync(Post post, MatchDetailsInfo matchDetails, CancellationToken ct)
     {
-        var reviews = await _matchClient.GetReviewsAsync(post.MatchId, ct);
-        var playerInfos = await _avatarsClient.GetPlayerInfosAsync(
+        // Reviews and player avatars depend only on data already in hand — fetch them concurrently.
+        var reviewsTask = _matchClient.GetReviewsAsync(post.MatchId, ct);
+        var playerInfosTask = _avatarsClient.GetPlayerInfosAsync(
             matchDetails.Participants.Where(p => p.Team is "Home" or "Away").Select(p => p.UserId), ct);
+        await Task.WhenAll(reviewsTask, playerInfosTask);
+
+        var reviews = await reviewsTask;
+        var playerInfos = await playerInfosTask;
         string ResolveName(Guid userId, string fallback)
         {
             var i = playerInfos.GetValueOrDefault(userId);
