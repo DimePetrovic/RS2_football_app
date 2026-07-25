@@ -209,8 +209,6 @@ Predlog redosleda za demo/proveru:
 
 ## 7. Automatski testovi
 
-Unit i integracioni testovi po servisima (auth, match, profile, rating, social):
-
 ```bash
 # svi testovi
 dotnet test
@@ -219,11 +217,53 @@ dotnet test
 dotnet test tests/services/auth/Comeback.Auth.Application.Tests
 ```
 
+Pokriveni servisi:
+
+| Vrsta | Servisi |
+|---|---|
+| Unit testovi | auth, chat, match, profile, rating, social |
+| Integracioni testovi | auth, match, profile, social |
+
 > Integracioni testovi koriste Testcontainers, pa Docker mora biti pokrenut.
 
 ---
 
-## 8. Posle izmena koda
+## 8. Dokumentacija koda (Doxygen)
+
+Backend kod je dokumentovan XML doc komentarima iz kojih se generiše HTML
+dokumentacija. **Generisani HTML se ne commituje** (`docs/api/` je u
+`.gitignore`) — pravi se po potrebi.
+
+### Preduslovi
+
+- [Doxygen](https://www.doxygen.nl/download.html)
+- **Python** — `Doxyfile` propušta `.cs` fajlove kroz
+  `scripts/doxygen-csharp-filter.py`, pa `python` mora biti na PATH-u.
+  Skripta je u repozitorijumu, ne instalira se ništa dodatno.
+
+```bash
+doxygen --version
+python --version
+```
+
+### Generisanje
+
+Iz **korena repozitorijuma**:
+
+```bash
+doxygen Doxyfile
+```
+
+Zatim otvori **`docs/api/html/index.html`** u browseru.
+
+### Šta je pokriveno
+
+Ceo `src/` rekurzivno (`*.cs`), bez `obj/`, `bin/` i `Migrations/` foldera.
+Eventualna upozorenja se upisuju u `docs/api/doxygen-warnings.log`.
+
+---
+
+## 9. Posle izmena koda
 
 Backend se **ne** osvežava sam — rebuild servisa koji si menjao:
 
@@ -236,7 +276,7 @@ Frontend (`npm start`) se osvežava automatski (hot reload).
 
 ---
 
-## 9. Zaustavljanje i čišćenje
+## 10. Zaustavljanje i čišćenje
 
 ```bash
 cd infra/docker
