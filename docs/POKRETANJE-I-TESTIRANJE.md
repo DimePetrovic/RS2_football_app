@@ -221,7 +221,7 @@ Pokriveni servisi:
 
 | Vrsta | Servisi |
 |---|---|
-| Unit testovi | auth, chat, match, profile, rating, social |
+| Unit testovi | auth, chat, match, notification, profile, rating, social |
 | Integracioni testovi | auth, match, profile, social |
 
 > Integracioni testovi koriste Testcontainers, pa Docker mora biti pokrenut.
