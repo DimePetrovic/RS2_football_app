@@ -271,12 +271,6 @@ Pokriveni tokovi:
 | Token izdat od auth servisa važi i u drugim servisima | auth → gateway → profile / notification |
 | Gateway odbija neautentifikovane zahteve | gateway → profile / notification / match |
 
-> **Poznato ponašanje:** prvi verifikacioni mejl nakon što notification servis odstoji
-> propadne sa `SmtpException: Timeout - closing connection` i završi u redu
-> `notification-email-verification-requested_error`. Svaki sledeći prolazi normalno.
-> Fixture zato namerno „potroši" jednu registraciju pre testova
-> (`LiveStackFixture.WarmUpSmtpAsync`). Kad se propust popravi, taj warm-up treba obrisati.
-
 ---
 
 ## 8. Dokumentacija koda (Doxygen)

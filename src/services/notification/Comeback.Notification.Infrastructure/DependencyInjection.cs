@@ -32,9 +32,14 @@ public static class DependencyInjection
         var smtp = configuration.GetSection(SmtpSettings.SectionName).Get<SmtpSettings>()
                    ?? new SmtpSettings();
 
+        // A new SmtpClient per send, deliberately. A single shared instance keeps its connection
+        // open between sends; once the server drops that idle connection, the next send fails with
+        // "Service not available ... Timeout - closing connection" and the message is lost. That is
+        // exactly what happened to the first verification email after any quiet period.
+        // SmtpClient is also not safe for concurrent sends, which a shared instance invites.
         services
             .AddFluentEmail(smtp.FromEmail, smtp.FromName)
-            .AddSmtpSender(new SmtpClient(smtp.Host, smtp.Port)
+            .AddSmtpSender(() => new SmtpClient(smtp.Host, smtp.Port)
             {
                 Credentials = smtp.Username is not null
                     ? new NetworkCredential(smtp.Username, smtp.Password)
@@ -74,6 +79,14 @@ public static class DependencyInjection
                     h.Username(configuration["RabbitMq:Username"] ?? "comeback");
                     h.Password(configuration["RabbitMq:Password"] ?? "comeback_dev");
                 });
+
+                // Sending mail and pushing notifications can fail transiently (SMTP hiccup,
+                // a dropped connection). Without a retry the very first failure moves the
+                // message to the _error queue and the user never receives it.
+                cfg.UseMessageRetry(r => r.Intervals(
+                    TimeSpan.FromSeconds(1),
+                    TimeSpan.FromSeconds(5),
+                    TimeSpan.FromSeconds(15)));
 
                 cfg.ConfigureEndpoints(ctx);
             });
