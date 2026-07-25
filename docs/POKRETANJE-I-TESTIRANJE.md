@@ -226,6 +226,20 @@ Pokriveni servisi:
 
 > Integracioni testovi koriste Testcontainers, pa Docker mora biti pokrenut.
 
+### Frontend testovi
+
+```bash
+cd web/comeback-web
+npm test          # ng test
+```
+
+Podrazumevano otvara Chrome i ostaje u watch režimu. Za jednokratno pokretanje
+(npr. u CI-ju):
+
+```bash
+npx ng test --watch=false --browsers=ChromeHeadless
+```
+
 ### End-to-end testovi
 
 Integracioni testovi podižu **jedan** servis u procesu i fejkuju messaging i pozive ka
