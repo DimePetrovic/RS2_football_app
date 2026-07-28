@@ -44,15 +44,13 @@
 
           <mat-form-field appearance="outline">
             <mat-label>{{ 'auth.completeProfile.dateOfBirth' | translate }}</mat-label>
-            <input matInput formControlName="dateOfBirth" type="text" placeholder="dd/mm/yyyy" maxlength="10" />
+            <input matInput [matDatepicker]="dobPicker" formControlName="dateOfBirth"
+              [min]="minDob" [max]="maxDob" readonly (click)="dobPicker.open()"
+              placeholder="dd/MM/yyyy" required />
+            <mat-datepicker-toggle matIconSuffix [for]="dobPicker" />
+            <mat-datepicker #dobPicker startView="multi-year" />
             @if (form.get('dateOfBirth')?.hasError('required') && form.get('dateOfBirth')?.touched) {
               <mat-error>{{ 'errors.required' | translate }}</mat-error>
-            } @else if (form.get('dateOfBirth')?.hasError('dateFormat') && form.get('dateOfBirth')?.touched) {
-              <mat-error>{{ 'errors.dateFormat' | translate }}</mat-error>
-            } @else if (form.get('dateOfBirth')?.hasError('dateInvalid') && form.get('dateOfBirth')?.touched) {
-              <mat-error>{{ 'errors.dateInvalid' | translate }}</mat-error>
-            } @else if (form.get('dateOfBirth')?.hasError('dateYear') && form.get('dateOfBirth')?.touched) {
-              <mat-error>{{ 'errors.dateYear' | translate }}</mat-error>
             }
           </mat-form-field>
 

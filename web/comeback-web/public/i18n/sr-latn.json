@@ -486,6 +486,7 @@
     }
   },
   "errors": {
+    "required": "Obavezno polje.",
     "http": {
       "offline": "Nema veze sa serverom. Proveri internet konekciju.",
       "forbidden": "Nemaš dozvolu za ovu akciju.",

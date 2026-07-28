@@ -7,16 +7,14 @@ import {
   signal,
 } from '@angular/core';
 import {
-  AbstractControl,
   FormBuilder,
   ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
@@ -37,41 +35,13 @@ const CURRENT_YEAR = new Date().getFullYear();
 const MIN_YEAR = 1920;
 const MIN_AGE = 5;
 
-function ddmmyyyyValidator(): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const val: string = control.value ?? '';
-    if (!val) return null;
-
-    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(val)) {
-      return { dateFormat: true };
-    }
-
-    const [dd, mm, yyyy] = val.split('/').map(Number);
-    const year = yyyy;
-
-    if (year < MIN_YEAR || year > CURRENT_YEAR - MIN_AGE) {
-      return { dateYear: true };
-    }
-
-    const date = new Date(year, mm - 1, dd);
-    if (
-      date.getFullYear() !== year ||
-      date.getMonth() !== mm - 1 ||
-      date.getDate() !== dd
-    ) {
-      return { dateInvalid: true };
-    }
-
-    return null;
-  };
-}
-
 @Component({
   selector: 'app-complete-profile',
   imports: [
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatDatepickerModule,
     MatSelectModule,
     MatCheckboxModule,
     MatButtonModule,
@@ -99,6 +69,9 @@ export class CompleteProfileComponent implements OnInit {
   private userId = '';
   private token = '';
 
+  readonly minDob = new Date(MIN_YEAR, 0, 1);
+  readonly maxDob = new Date(CURRENT_YEAR - MIN_AGE, 11, 31);
+
   readonly positions = [
     { value: 0, labelKey: 'auth.completeProfile.positions.goalkeeper' },
     { value: 1, labelKey: 'auth.completeProfile.positions.defender' },
@@ -109,7 +82,7 @@ export class CompleteProfileComponent implements OnInit {
   readonly form = this.fb.group({
     firstName: ['', [Validators.required, Validators.maxLength(100)]],
     lastName: ['', [Validators.required, Validators.maxLength(100)]],
-    dateOfBirth: ['', [Validators.required, ddmmyyyyValidator()]],
+    dateOfBirth: [null as Date | null, Validators.required],
     nationality: [null as string | null],
     preferredPosition: [null as number | null, Validators.required],
     canPlayGoalkeeper: [false],
@@ -184,8 +157,8 @@ export class CompleteProfileComponent implements OnInit {
     const { firstName, lastName, dateOfBirth, preferredPosition, canPlayGoalkeeper, youthSeasons, seniorSeasons } =
       this.form.value;
 
-    const [dd, mm, yyyy] = dateOfBirth!.split('/');
-    const isoDate = `${yyyy}-${mm}-${dd}`;
+    const dob = dateOfBirth!;
+    const isoDate = `${dob.getFullYear()}-${String(dob.getMonth() + 1).padStart(2, '0')}-${String(dob.getDate()).padStart(2, '0')}`;
 
     this.auth.completeRegistration({
       userId: this.userId,
