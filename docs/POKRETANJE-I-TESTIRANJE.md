@@ -172,11 +172,41 @@ Kredencijali za RabbitMQ i baze: `comeback` / `comeback_dev`.
 
 | Polje | Vrednost |
 |---|---|
-| Email | `d7petrovic@gmail.com` |
+| Email | `admin@comeback.com` |
 | Lozinka | `Test!234` |
 
 Obične korisnike napravi kroz **registraciju** u aplikaciji (verifikacioni mejl
 stiže u **MailDev**, http://localhost:1080 — klikni link iz mejla).
+
+### Demo podaci (seeder)
+
+Umesto ručnog pravljenja podataka, seeder napuni aplikaciju kompletnim demo
+setom: 16 korisnika, follow veze, 3 grupe, 7 odigranih mečeva sa rezultatima i
+golovima (→ feed postovi + XP), 2 predstojeća meča sa „tražimo igrača" pozivom,
+lajkovi, komentari i recenzije. Sve ide kroz javne API-je (gateway + MailDev),
+pa nastaje kroz iste tokove kao pri ručnom korišćenju.
+
+```bash
+# stack mora već da radi (sekcija 2)
+dotnet run --project tools/Comeback.DemoSeeder
+```
+
+- **Prvi run traje ~5 minuta** — registracije idu sekvencijalno kroz pravu
+  verifikaciju mejla (MailDev + outbox između servisa).
+- **Ponovni run je bezbedan** (sve je idempotentno) i traje ispod minuta; ako
+  je raniji run prekinut, nastavlja od mesta prekida.
+- Drugi portovi: `dotnet run --project tools/Comeback.DemoSeeder -- --gateway
+  http://localhost:5000 --maildev http://localhost:1080` (ili env promenljive
+  `E2E_GATEWAY_URL` / `E2E_MAILDEV_URL`).
+
+Svi demo nalozi imaju lozinku `Test!234` i email po obrascu
+`ime.prezime@demo.comeback.com`:
+
+| Primer naloga | Uloga u demo setu |
+|---|---|
+| `marko.petrovic@demo.comeback.com` | kapiten grupe „FK Blokovi", najviše mečeva |
+| `dusan.kovacevic@demo.comeback.com` | kapiten grupe „Ada Veterani" |
+| `nikola.jovanovic@demo.comeback.com` | kapiten grupe „Ponedeljak u Košutnjaku" |
 
 ---
 

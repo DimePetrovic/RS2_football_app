@@ -24,7 +24,7 @@ docker compose up -d --build
 
 Ovo diže sve zavisnosti i servise. **Migracije baza se izvršavaju automatski**
 pri startu svakog servisa — ne pokreću se ručno. Takođe se **automatski kreira
-admin nalog** (`d7petrovic@gmail.com` / `Test!234`).
+admin nalog** (`admin@comeback.com` / `Test!234`).
 
 | Servis / alat | URL |
 |---|---|
@@ -81,6 +81,20 @@ npm start
 ```
 
 Aplikacija se otvara na **http://localhost:4200**.
+
+### 4. Demo podaci (opciono)
+
+Kada je stack podignut, jedan alat napuni aplikaciju demo podacima (16 korisnika,
+grupe, odigrani mečevi sa rezultatima, feed sa lajkovima i komentarima):
+
+```bash
+dotnet run --project tools/Comeback.DemoSeeder
+```
+
+Prvi run traje ~5 minuta (registracije idu kroz pravu verifikaciju mejla preko
+MailDev-a); ponovni run je bezbedan i traje ispod minuta. Demo prijava:
+`marko.petrovic@demo.comeback.com` / `Test!234`. Detalji u
+[`docs/POKRETANJE-I-TESTIRANJE.md`](docs/POKRETANJE-I-TESTIRANJE.md), sekcija 5.
 
 ---
 

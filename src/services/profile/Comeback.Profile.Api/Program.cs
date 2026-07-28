@@ -128,7 +128,7 @@ static async Task SeedAdminProfileAsync(ProfileDbContext db)
     var profile = UserProfile.Create(
         adminUserId,
         "admin",
-        "d7petrovic@gmail.com",
+        "admin@comeback.com",
         "Dimitrije",
         "Petrović",
         new DateOnly(1990, 1, 1),
