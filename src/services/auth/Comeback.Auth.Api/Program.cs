@@ -95,7 +95,7 @@ finally
 // Must match the admin UserId seeded in the Profile service.
 static async Task SeedAdminUserAsync(UserManager<ApplicationUser> userManager)
 {
-    const string adminEmail = "d7petrovic@gmail.com";
+    const string adminEmail = "admin@comeback.com";
 
     if (await userManager.FindByEmailAsync(adminEmail) is not null)
         return;

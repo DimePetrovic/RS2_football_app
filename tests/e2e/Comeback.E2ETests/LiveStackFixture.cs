@@ -134,7 +134,7 @@ public sealed class LiveStackFixture : IAsyncLifetime
     public async Task<string> LoginAsSeededAdminAsync()
     {
         var login = await Gateway.PostAsJsonAsync("/api/auth/login",
-            new { email = "d7petrovic@gmail.com", password = "Test!234" }, Json);
+            new { email = "admin@comeback.com", password = "Test!234" }, Json);
 
         if (!login.IsSuccessStatusCode)
             throw new InvalidOperationException(
