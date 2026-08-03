@@ -374,6 +374,10 @@ docker compose down -v       # zaustavi + OBRIŠI sve baze/podatke (čist start)
 
 ## Kratak pregled arhitekture
 
+> Detaljni dijagrami sistema (komponente, slojevi, klasni dijagrami po servisu,
+> ključni tokovi) nalaze se u [README.md](../README.md#arhitektura-sistema),
+> sekcija **Arhitektura sistema**.
+
 ```
 Angular (4200)
      │  HTTP + WebSocket (SignalR)
